@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FPTStella.Application.Common.DTOs.Users
+namespace FPTStella.Contracts.DTOs.Users
 {
     public class CreateUserDto
     {

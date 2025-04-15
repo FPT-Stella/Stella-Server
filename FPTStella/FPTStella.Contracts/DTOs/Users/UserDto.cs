@@ -1,5 +1,5 @@
 ﻿
-namespace FPTStella.Application.Common.DTOs.Users
+namespace FPTStella.Contracts.DTOs.Users
 {
     public class UserDto
     {

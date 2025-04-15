@@ -1,8 +1,8 @@
-﻿using FPTStella.Application.Common.DTOs.Users;
-using FPTStella.Application.Common.Interfaces.Services;
+﻿using FPTStella.Application.Common.Interfaces.Services;
 using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Domain.Entities;
 using BCrypt.Net;
+using FPTStella.Contracts.DTOs.Users;
 
 namespace FPTStella.Application.Services
 {
@@ -33,6 +33,57 @@ namespace FPTStella.Application.Services
                 Role = createUserDto.Role,
                 FullName = createUserDto.FullName,
                 Email = createUserDto.Email,
+            };
+
+            await repository.InsertAsync(user);
+            await _unitOfWork.SaveAsync();
+
+            return new UserDto
+            {
+                Id = user.Id.ToString(),
+                Username = user.Username,
+                Role = user.Role,
+                FullName = user.FullName,
+                Email = user.Email,
+            };
+        }
+
+        public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+        {
+            var repository = _unitOfWork.Repository<User>();
+            var users = await repository.GetAllAsync();
+            return users.Select(user => new UserDto
+            {
+                Id = user.Id.ToString(),
+                Username = user.Username,
+                Role = user.Role,
+                FullName = user.FullName,
+                Email = user.Email,
+            });
+        }
+
+        public async Task<UserDto> FindOrCreateGoogleUserAsync(string email, string fullName)
+        {
+            var repository = _unitOfWork.Repository<User>();
+            var user = await repository.FindOneAsync(u => u.Email == email);
+            if (user != null)
+            {
+                return new UserDto
+                {
+                    Id = user.Id.ToString(),
+                    Username = user.Username,
+                    Role = user.Role,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                };
+            }
+
+            user = new User
+            {
+                Username = email.Split('@')[0],
+                Email = email,
+                FullName = fullName,
+                Role = "User",
             };
 
             await repository.InsertAsync(user);

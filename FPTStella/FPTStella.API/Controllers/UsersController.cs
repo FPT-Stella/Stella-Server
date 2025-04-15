@@ -1,5 +1,5 @@
-﻿using FPTStella.Application.Common.DTOs.Users;
-using FPTStella.Application.Common.Interfaces.Services;
+﻿using FPTStella.Application.Common.Interfaces.Services;
+using FPTStella.Contracts.DTOs.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +23,20 @@ namespace FPTStella.API.Controllers
             {
                 var userDto = await _userService.CreateUserAsync(createUserDto);
                 return CreatedAtAction(nameof(GetUserById), new { id = userDto.Id }, userDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsers([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var usersDto = await _userService.GetAllUsersAsync();
+                return Ok(usersDto);
             }
             catch (Exception ex)
             {
