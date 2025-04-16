@@ -1,44 +1,63 @@
-﻿using FPTStella.Application.Common.Interfaces.Persistences;
+﻿using FPTStella.Application.Common.Interfaces.Google;
+using FPTStella.Application.Common.Interfaces.Jwt;
+using FPTStella.Application.Common.Interfaces.Persistences;
 using FPTStella.Application.Common.Interfaces.Services;
 using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Application.Services;
+using FPTStella.Application.UseCases.Auth;
+using FPTStella.Contracts.DTOs.Jwt;
+using FPTStella.Domain.Interfaces;
+using FPTStella.Infrastructure.Data;
 using FPTStella.Infrastructure.Persistences;
 using FPTStella.Infrastructure.UnitOfWorks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 //User Secrets được thêm vào configuration (mặc định trong Development)
-builder.Configuration.AddUserSecrets<Program>(optional: true);
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddUserSecrets<Program>()
+    .AddEnvironmentVariables();
 
 // Add services to the container.
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IMongoDbContext, MongoDbContext>();
 builder.Services.AddSingleton<IUnitOfWork, UnitOfWork>();
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
 
 // Đăng ký DI cho Application
 builder.Services.AddSingleton<IUserService, UserService>();
-builder.Services.AddSingleton<IAuthService, AuthService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<GoogleLoginUseCase>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+
 
 //JWT
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+
+var jwtSecret = builder.Configuration["JwtSettings:AccessSecretToken"];
+var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
+var jwtAudience = builder.Configuration["JwtSettings:Audience"];
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]))
-    };
-});
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer, // "Jwt"
+            ValidAudience = jwtAudience, // "Jwt"
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)) // Sử dụng JwtSettings:Secret
+        };
+    });
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -52,6 +71,8 @@ builder.Services.AddCors(options =>
         builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
     });
 });
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -66,6 +87,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 

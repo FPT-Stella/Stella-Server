@@ -3,24 +3,23 @@ using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Domain.Entities;
 using BCrypt.Net;
 using FPTStella.Contracts.DTOs.Users;
+using FPTStella.Domain.Interfaces;
 
 namespace FPTStella.Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(IUnitOfWork unitOfWork)
+        public UserService(IUserRepository userRepository)
         {
-            _unitOfWork = unitOfWork;
+            _userRepository = userRepository;
         }
 
         public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto)
         {
-            var repository = _unitOfWork.Repository<User>();
-
             // Kiểm tra username đã tồn tại
-            var existingUser = await repository.FindOneAsync(u => u.Username == createUserDto.Username);
+            var existingUser = await _userRepository.GetByUsernameAsync(createUserDto.Username);
             if (existingUser != null)
             {
                 throw new Exception("Username already exists.");
@@ -30,13 +29,12 @@ namespace FPTStella.Application.Services
             {
                 Username = createUserDto.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password),
-                Role = createUserDto.Role,
+                Role = "Student",
                 FullName = createUserDto.FullName,
                 Email = createUserDto.Email,
             };
 
-            await repository.InsertAsync(user);
-            await _unitOfWork.SaveAsync();
+            await _userRepository.CreateAsync(user);
 
             return new UserDto
             {
@@ -50,8 +48,7 @@ namespace FPTStella.Application.Services
 
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
         {
-            var repository = _unitOfWork.Repository<User>();
-            var users = await repository.GetAllAsync();
+            var users = await _userRepository.GetAllAsync();
             return users.Select(user => new UserDto
             {
                 Id = user.Id.ToString(),
@@ -64,36 +61,12 @@ namespace FPTStella.Application.Services
 
         public async Task<UserDto> FindOrCreateGoogleUserAsync(string email, string fullName)
         {
-            var repository = _unitOfWork.Repository<User>();
-            var user = await repository.FindOneAsync(u => u.Email == email);
-            if (user != null)
-            {
-                return new UserDto
-                {
-                    Id = user.Id.ToString(),
-                    Username = user.Username,
-                    Role = user.Role,
-                    FullName = user.FullName,
-                    Email = user.Email,
-                };
-            }
-
-            user = new User
-            {
-                Username = email.Split('@')[0],
-                Email = email,
-                FullName = fullName,
-                Role = "User",
-            };
-
-            await repository.InsertAsync(user);
-            await _unitOfWork.SaveAsync();
-
+            var user = await _userRepository.FindOrCreateGoogleUserAsync(email, fullName);
             return new UserDto
             {
                 Id = user.Id.ToString(),
                 Username = user.Username,
-                Role = user.Role,
+                Role = "Student",
                 FullName = user.FullName,
                 Email = user.Email,
             };
@@ -101,8 +74,7 @@ namespace FPTStella.Application.Services
 
         public async Task<UserDto> GetUserByIdAsync(string id)
         {
-            var repository = _unitOfWork.Repository<User>();
-            var user = await repository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
             {
                 throw new Exception("User not found.");
@@ -120,8 +92,7 @@ namespace FPTStella.Application.Services
 
         public async Task<UserDto> GetUserByUsernameAsync(string username)
         {
-            var repository = _unitOfWork.Repository<User>();
-            var user = await repository.FindOneAsync(u => u.Username == username);
+            var user = await _userRepository.GetByUsernameAsync(username);
             if (user == null)
             {
                 throw new Exception("User not found.");
@@ -139,8 +110,7 @@ namespace FPTStella.Application.Services
 
         public async Task UpdateUserAsync(string id, CreateUserDto updateUserDto)
         {
-            var repository = _unitOfWork.Repository<User>();
-            var user = await repository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
             {
                 throw new Exception("User not found.");
@@ -152,15 +122,12 @@ namespace FPTStella.Application.Services
             user.FullName = updateUserDto.FullName;
             user.Email = updateUserDto.Email;
 
-            await repository.ReplaceAsync(id, user);
-            await _unitOfWork.SaveAsync();
+            await _userRepository.UpdateAsync(id, user);
         }
 
         public async Task DeleteUserAsync(string id)
         {
-            var repository = _unitOfWork.Repository<User>();
-            await repository.DeleteAsync(id);
-            await _unitOfWork.SaveAsync();
+            await _userRepository.DeleteAsync(id);
         }
     }
 }
