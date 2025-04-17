@@ -23,7 +23,7 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddUserSecrets<Program>()
-    .AddEnvironmentVariables();
+    .AddEnvironmentVariables(JwtSettings_);
 
 // Add services to the container.
 builder.Services.AddHttpClient();
