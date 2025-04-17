@@ -11,17 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout mã nguồn từ GitHub
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2. Setup .NET 8 SDK
       - name: Setup .NET 8 SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
+      # 3. Publish ứng dụng API (FPTStella.API)
       - name: Publish .NET project
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish FPTStella/FPTStella.API/FPTStella.API.csproj -c Release -o ./publish
 
+      # 4. Sao chép các tệp đã publish lên VPS
       - name: Copy files to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -33,6 +37,7 @@ jobs:
           target: "${{ secrets.REMOTE_TARGET }}"
           rm: true
 
+      # 5. Khởi động lại dịch vụ trên VPS
       - name: Restart service on VPS
         uses: appleboy/ssh-action@v0.1.10
         with:
