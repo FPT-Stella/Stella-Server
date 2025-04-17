@@ -1,6 +1,7 @@
-﻿using FPTStella.Application.Common.Interfaces.UnitOfWorks;
+﻿using FPTStella.Application.Common.Interfaces.Repositories;
+using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Domain.Entities;
-using FPTStella.Domain.Interfaces;
+using FPTStella.Domain.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +58,7 @@ namespace FPTStella.Infrastructure.Data
                 Username = email.Split('@')[0],
                 Email = email,
                 FullName = fullName,
-                Role = "User",
+                Role = Role.Student,
             };
 
             await _repository.InsertAsync(user);

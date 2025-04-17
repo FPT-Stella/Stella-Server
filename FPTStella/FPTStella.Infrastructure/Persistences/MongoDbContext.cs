@@ -6,6 +6,8 @@ namespace FPTStella.Infrastructure.Persistences
 {
     public class MongoDbContext : IMongoDbContext
     {
+        private readonly MongoClient _client;
+        private bool _disposed;
         public IMongoDatabase Database { get; }
 
         public MongoDbContext(IConfiguration configuration)
@@ -21,8 +23,20 @@ namespace FPTStella.Infrastructure.Persistences
             }
 
             var mongoUrl = new MongoUrl(connectionString);
-            var client = new MongoClient(mongoUrl);
-            Database = client.GetDatabase(mongoUrl.DatabaseName);
+            var settings = MongoClientSettings.FromUrl(mongoUrl);
+            settings.RetryWrites = true; // Retry writes on failure
+            settings.ConnectTimeout = TimeSpan.FromSeconds(30); // Timeout for connection
+            settings.ServerSelectionTimeout = TimeSpan.FromSeconds(30); // Timeout for server selection
+
+            _client = new MongoClient(settings);
+            Database = _client.GetDatabase(mongoUrl.DatabaseName);
+        }
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                _disposed = true;
+            }
         }
     }
 }

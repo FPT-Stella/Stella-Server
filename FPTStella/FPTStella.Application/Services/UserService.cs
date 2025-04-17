@@ -3,7 +3,8 @@ using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Domain.Entities;
 using BCrypt.Net;
 using FPTStella.Contracts.DTOs.Users;
-using FPTStella.Domain.Interfaces;
+using FPTStella.Domain.Enum;
+using FPTStella.Application.Common.Interfaces.Repositories;
 
 namespace FPTStella.Application.Services
 {
@@ -29,7 +30,7 @@ namespace FPTStella.Application.Services
             {
                 Username = createUserDto.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password),
-                Role = "Student",
+                Role = Role.Student,
                 FullName = createUserDto.FullName,
                 Email = createUserDto.Email,
             };
@@ -40,7 +41,7 @@ namespace FPTStella.Application.Services
             {
                 Id = user.Id.ToString(),
                 Username = user.Username,
-                Role = user.Role,
+                Role = user.Role.ToString(),
                 FullName = user.FullName,
                 Email = user.Email,
             };
@@ -53,7 +54,7 @@ namespace FPTStella.Application.Services
             {
                 Id = user.Id.ToString(),
                 Username = user.Username,
-                Role = user.Role,
+                Role = user.Role.ToString(),
                 FullName = user.FullName,
                 Email = user.Email,
             });
@@ -66,7 +67,7 @@ namespace FPTStella.Application.Services
             {
                 Id = user.Id.ToString(),
                 Username = user.Username,
-                Role = "Student",
+                Role = user.Role.ToString(),
                 FullName = user.FullName,
                 Email = user.Email,
             };
@@ -84,7 +85,7 @@ namespace FPTStella.Application.Services
             {
                 Id = user.Id.ToString(),
                 Username = user.Username,
-                Role = user.Role,
+                Role = user.Role.ToString(),
                 FullName = user.FullName,
                 Email = user.Email,
             };
@@ -102,7 +103,7 @@ namespace FPTStella.Application.Services
             {
                 Id = user.Id.ToString(),
                 Username = user.Username,
-                Role = user.Role,
+                Role = user.Role.ToString(),
                 FullName = user.FullName,
                 Email = user.Email,
             };
@@ -118,7 +119,7 @@ namespace FPTStella.Application.Services
 
             user.Username = updateUserDto.Username;
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateUserDto.Password);
-            user.Role = updateUserDto.Role;
+            user.Role = Role.Student;
             user.FullName = updateUserDto.FullName;
             user.Email = updateUserDto.Email;
 

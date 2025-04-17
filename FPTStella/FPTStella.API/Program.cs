@@ -1,12 +1,12 @@
 ﻿using FPTStella.Application.Common.Interfaces.Google;
 using FPTStella.Application.Common.Interfaces.Jwt;
 using FPTStella.Application.Common.Interfaces.Persistences;
+using FPTStella.Application.Common.Interfaces.Repositories;
 using FPTStella.Application.Common.Interfaces.Services;
 using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Application.Services;
 using FPTStella.Application.UseCases.Auth;
 using FPTStella.Contracts.DTOs.Jwt;
-using FPTStella.Domain.Interfaces;
 using FPTStella.Infrastructure.Data;
 using FPTStella.Infrastructure.Persistences;
 using FPTStella.Infrastructure.UnitOfWorks;

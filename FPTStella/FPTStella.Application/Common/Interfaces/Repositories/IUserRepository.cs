@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FPTStella.Domain.Interfaces
+namespace FPTStella.Application.Common.Interfaces.Repositories
 {
     public interface IUserRepository
     {
