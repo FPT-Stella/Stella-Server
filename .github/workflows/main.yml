@@ -20,7 +20,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Publish .NET project
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish FPTStella/FPTStella.API/FPTStella.API.csproj -c Release -o ./publish
 
       - name: Copy files to VPS
         uses: appleboy/scp-action@v0.1.7
