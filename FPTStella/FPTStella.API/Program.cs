@@ -30,16 +30,20 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IMongoDbContext, MongoDbContext>();
 builder.Services.AddSingleton<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IStudentRepository, StudentRepository>();
 
 // Đăng ký DI cho Application
 builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<IStudentService, StudentService>();
+
+
+
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 
 //JWT
-
 var jwtSecret = builder.Configuration["JwtSettings:AccessSecretToken"];
 var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
 var jwtAudience = builder.Configuration["JwtSettings:Audience"];

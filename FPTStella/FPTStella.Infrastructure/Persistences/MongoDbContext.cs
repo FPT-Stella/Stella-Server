@@ -1,10 +1,15 @@
 ﻿using FPTStella.Application.Common.Interfaces.Persistences;
 using MongoDB.Driver;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
+using MongoDB.Bson.Serialization.Serializers;
+
 
 namespace FPTStella.Infrastructure.Persistences
 {
-    public class MongoDbContext : IMongoDbContext
+    public class MongoDbContext : IMongoDbContext, IDisposable
     {
         private readonly MongoClient _client;
         private bool _disposed;
@@ -24,12 +29,30 @@ namespace FPTStella.Infrastructure.Persistences
 
             var mongoUrl = new MongoUrl(connectionString);
             var settings = MongoClientSettings.FromUrl(mongoUrl);
-            settings.RetryWrites = true; // Retry writes on failure
-            settings.ConnectTimeout = TimeSpan.FromSeconds(30); // Timeout for connection
-            settings.ServerSelectionTimeout = TimeSpan.FromSeconds(30); // Timeout for server selection
+            settings.RetryWrites = true;
+            settings.ConnectTimeout = TimeSpan.FromSeconds(30);
+            settings.ServerSelectionTimeout = TimeSpan.FromSeconds(30);
+
+            // Cấu hình GuidRepresentation trong MongoClientSettings (phiên bản 2.3.0)
+            settings.GuidRepresentation = GuidRepresentation.Standard;
 
             _client = new MongoClient(settings);
-            Database = _client.GetDatabase(mongoUrl.DatabaseName);
+
+            string databaseName = "StellaDb";
+            if (string.IsNullOrEmpty(mongoUrl.DatabaseName))
+            {
+                Database = _client.GetDatabase(databaseName);
+            }
+            else
+            {
+                Database = _client.GetDatabase(mongoUrl.DatabaseName);
+            }
+
+            // Đăng ký serializer cho Guid để serialize/deserialize dưới dạng string
+            if (!BsonSerializer.LookupSerializer<Guid>().GetType().Equals(typeof(GuidSerializer)))
+            {
+                BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+            }
         }
         public void Dispose()
         {
