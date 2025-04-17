@@ -1,4 +1,4 @@
-# Stella Server
+# Stella Server 🌠🪐
 
 ![GitHub](https://img.shields.io/github/license/FPT-Stella/Stella-Server)  
 ![GitHub last commit](https://img.shields.io/github/last-commit/FPT-Stella/Stella-Server)  
@@ -8,7 +8,7 @@
 
 Bạn có thể xem tài liệu API tại: [Swagger UI](http://103.179.185.152:5000/swagger/index.html).
 
-## Mục lục
+## Mục lục 📚
 
 - [Kiến trúc dự án](#kiến-trúc-dự-án)
 - [Ý nghĩa của các tầng](#ý-nghĩa-của-các-tầng)
@@ -18,7 +18,7 @@ Bạn có thể xem tài liệu API tại: [Swagger UI](http://103.179.185.152:5
 - [Đóng góp](#đóng-góp)
 - [Giấy phép](#giấy-phép)
 
-## Kiến trúc dự án
+## Kiến trúc dự án 🛠️
 
 Dự án được xây dựng theo **kiến trúc phân tầng (Layered Architecture)**, giúp tách biệt các trách nhiệm và tăng tính bảo trì, mở rộng của hệ thống. Cấu trúc thư mục chính bao gồm:
 
@@ -27,7 +27,7 @@ Dự án được xây dựng theo **kiến trúc phân tầng (Layered Architec
 - **FPTStella.Infrastructure**: Chứa các triển khai liên quan đến cơ sở hạ tầng (database, persistence).
 - **FPTStella.Api**: Chứa các controller và cấu hình API.
 
-## Ý nghĩa của các tầng
+## 🍀 Ý nghĩa của các tầng 🍀
 
 ### 1. Domain Layer (`FPTStella.Domain`)
 - **Ý nghĩa**: Đây là tầng cốt lõi, chứa các entity (như `Student`, `User`) và logic nghiệp vụ thuần túy không phụ thuộc vào bất kỳ công nghệ nào. Tầng này định nghĩa các quy tắc và cấu trúc dữ liệu cơ bản của hệ thống.
