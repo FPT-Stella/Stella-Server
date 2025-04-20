@@ -1,6 +1,7 @@
 ﻿using FPTStella.Application.Common.Interfaces.Persistences;
 using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Infrastructure.UnitOfWorks.Repositories;
+using MongoDB.Driver;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,20 +13,20 @@ namespace FPTStella.Infrastructure.UnitOfWorks
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly IMongoDbContext _context;
+        private readonly IMongoDatabase _database;
         private readonly ConcurrentDictionary<Type, object> _repositories;
         private bool _disposed;
 
-        public UnitOfWork(IMongoDbContext context)
+        public UnitOfWork(IMongoDatabase database)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _database = database ?? throw new ArgumentNullException(nameof(database));
             _repositories = new ConcurrentDictionary<Type, object>();
         }
 
         public IRepository<TEntity> Repository<TEntity>() where TEntity : class
         {
             return (IRepository<TEntity>)_repositories.GetOrAdd(typeof(TEntity), _ =>
-                new Repository<TEntity>(_context.Database, typeof(TEntity).Name));
+                new Repository<TEntity>(_database, typeof(TEntity).Name));
         }
 
         public async Task SaveAsync(CancellationToken cancellationToken = default)

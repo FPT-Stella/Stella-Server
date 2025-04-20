@@ -11,13 +11,14 @@ namespace FPTStella.Infrastructure.UnitOfWorks.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly IMongoCollection<T> _collection;
+        protected readonly IMongoCollection<T> _collection;
+        protected IMongoCollection<T> Collection => _collection;
 
         public Repository(IMongoDatabase database, string collectionName)
         {
             _collection = database.GetCollection<T>(collectionName);
 
-            if (typeof(T) == typeof(FPTStella.Domain.Entities.User))
+            if (typeof(T) == typeof(FPTStella.Domain.Entities.Account))
             {
                 var indexKeys = Builders<T>.IndexKeys.Ascending("username");
                 var indexOptions = new CreateIndexOptions { Unique = true };

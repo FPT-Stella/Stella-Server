@@ -7,11 +7,11 @@ namespace FPTStella.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class AccountsController : BaseController
     {
-        private readonly IUserService _userService;
+        private readonly IAccountService _userService;
 
-        public UsersController(IUserService userService)
+        public AccountsController(IAccountService userService)
         {
             _userService = userService;
         }
@@ -26,12 +26,12 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return HandleException(ex);
             }
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsers([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAllUsers()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return HandleException(ex);
             }
         }
 
@@ -54,7 +54,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                return HandleException(ex);
             }
         }
 
@@ -68,7 +68,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                return HandleException(ex);
             }
         }
 
@@ -82,7 +82,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return HandleException(ex);
             }
         }
 
@@ -96,7 +96,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                return HandleException(ex);
             }
         }
     }

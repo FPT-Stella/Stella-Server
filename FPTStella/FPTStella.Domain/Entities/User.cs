@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FPTStella.Domain.Entities
 {
-    public class User : BaseEntity
+    public class Account : BaseEntity
     {
         [BsonElement("username")]
         public string Username { get; set; }

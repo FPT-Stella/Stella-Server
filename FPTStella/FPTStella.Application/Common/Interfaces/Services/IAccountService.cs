@@ -3,7 +3,7 @@
 
 namespace FPTStella.Application.Common.Interfaces.Services
 {
-    public interface IUserService
+    public interface IAccountService
     {
         Task<UserDto> CreateUserAsync(CreateUserDto createUserDto);
         Task<IEnumerable<UserDto>> GetAllUsersAsync();

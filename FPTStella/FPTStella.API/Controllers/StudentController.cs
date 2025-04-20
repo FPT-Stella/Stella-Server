@@ -7,7 +7,7 @@ namespace FPTStella.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentController : ControllerBase
+    public class StudentController : BaseController
     {
         private readonly IStudentService _studentService;
 
@@ -21,11 +21,11 @@ namespace FPTStella.API.Controllers
             try
             {
                 var studentDto = await _studentService.CreateStudentAsync(createStudentDto);
-                return Ok(studentDto);
+                return CreatedAtAction(nameof(GetStudentById), new { id = studentDto.Id }, studentDto);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return HandleException(ex);
             }
         }
         [HttpGet("{id}")]
@@ -38,7 +38,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return HandleException(ex);
             }
         }
 
@@ -52,7 +52,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return HandleException(ex);
             }
         }
 
@@ -66,7 +66,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return HandleException(ex);
             }
         }
 
@@ -76,11 +76,11 @@ namespace FPTStella.API.Controllers
             try
             {
                 await _studentService.UpdateStudentAsync(id, updateStudentDto);
-                return Ok(new { message = "Student updated successfully." });
+                return NoContent();
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return HandleException(ex);
             }
         }
 
@@ -90,11 +90,11 @@ namespace FPTStella.API.Controllers
             try
             {
                 await _studentService.DeleteStudentAsync(id);
-                return Ok(new { message = "Student deleted successfully." });
+                return NoContent();
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return HandleException(ex);
             }
         }
     }

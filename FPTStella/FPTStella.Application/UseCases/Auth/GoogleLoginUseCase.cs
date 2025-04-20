@@ -14,13 +14,13 @@ namespace FPTStella.Application.UseCases.Auth
     public class GoogleLoginUseCase
     {
         private readonly IGoogleAuthService _googleAuthService;
-        private readonly IUserService _userService;
+        private readonly IAccountService _userService;
         private readonly IJwtService _jwtService;
         private readonly IConfiguration _configuration;
 
         public GoogleLoginUseCase(
             IGoogleAuthService googleAuthService,
-            IUserService userService,
+            IAccountService userService,
             IJwtService jwtService,
             IConfiguration configuration)
         {

@@ -27,16 +27,17 @@ builder.Configuration
 
 // Add services to the container.
 builder.Services.AddHttpClient();
+// Đăng ký MongoDbContext và IMongoDatabase
 builder.Services.AddSingleton<IMongoDbContext, MongoDbContext>();
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDbContext>().Database);
+// Đăng ký các repository và unit of work
 builder.Services.AddSingleton<IUnitOfWork, UnitOfWork>();
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddSingleton<IAccountRepository, AccountRepository>();
 builder.Services.AddSingleton<IStudentRepository, StudentRepository>();
 
 // Đăng ký DI cho Application
-builder.Services.AddSingleton<IUserService, UserService>();
+builder.Services.AddSingleton<IAccountService, AccountService>();
 builder.Services.AddSingleton<IStudentService, StudentService>();
-
-
 
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
@@ -82,8 +83,8 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");

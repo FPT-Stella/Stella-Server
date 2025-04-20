@@ -1,5 +1,6 @@
 ﻿using FPTStella.Application.Common.Interfaces.Repositories;
 using FPTStella.Application.Common.Interfaces.Services;
+using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Contracts.DTOs.Students;
 using FPTStella.Domain.Entities;
 using System;
@@ -12,41 +13,55 @@ namespace FPTStella.Application.Services
 {
     public class StudentService : IStudentService
     {
-        private readonly IStudentRepository _studentRepository;
-        private readonly IUserRepository _userRepository;
-        public StudentService(IStudentRepository studentRepository, IUserRepository userRepository)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public StudentService(IUnitOfWork unitOfWork)
         {
-            _studentRepository = studentRepository;
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
         }
+        private static StudentDto MapToStudentDto(Student student)
+        {
+            return new StudentDto
+            {
+                Id = student.Id.ToString(),
+                UserId = student.UserId.ToString(),
+                StudentCode = student.StudentCode,
+                Phone = student.Phone,
+                Address = student.Address,
+            };
+        }
+
         public async Task<StudentDto> CreateStudentAsync(CreateStudentDto createStudentDto)
         {
+            var studentRepository = _unitOfWork.Repository<Student>();
+            var accountRepository = _unitOfWork.Repository<Account>();
+
             if (!Guid.TryParse(createStudentDto.UserId, out var userId))
             {
                 throw new ArgumentException("Invalid UserId format.");
             }
 
-            var user = await _userRepository.GetByIdAsync(createStudentDto.UserId);
+            var user = await accountRepository.GetByIdAsync(createStudentDto.UserId);
             if (user == null)
             {
-                throw new Exception("User not found.");
+                throw new KeyNotFoundException("User not found.");
             }
 
             if (user.Role != FPTStella.Domain.Enum.Role.Student)
             {
-                throw new Exception("User must have role 'Student' to create a Student record.");
+                throw new InvalidOperationException("User must have role 'Student' to create a Student record.");
             }
 
-            var existingStudent = await _studentRepository.GetByUserIdAsync(userId);
+            var existingStudent = await studentRepository.FindOneAsync(s => s.UserId == userId);
             if (existingStudent != null)
             {
-                throw new Exception("A Student record already exists for this UserId.");
+                throw new InvalidOperationException("A Student record already exists for this UserId.");
             }
 
-            var studentByCode = await _studentRepository.GetByStudentCodeAsync(createStudentDto.StudentCode);
+            var studentByCode = await studentRepository.FindOneAsync(s => s.StudentCode == createStudentDto.StudentCode);
             if (studentByCode != null)
             {
-                throw new Exception("StudentCode already exists.");
+                throw new InvalidOperationException("StudentCode already exists.");
             }
 
             var student = new Student
@@ -57,51 +72,37 @@ namespace FPTStella.Application.Services
                 Address = createStudentDto.Address,
             };
 
-            await _studentRepository.InsertAsync(student);
+            await studentRepository.InsertAsync(student);
+            await _unitOfWork.SaveAsync();
 
-            return new StudentDto
-            {
-                Id = student.Id.ToString(),
-                UserId = student.UserId.ToString(),
-                StudentCode = student.StudentCode,
-                Phone = student.Phone,
-                Address = student.Address,
-            };
+            return MapToStudentDto(student);
         }
         public async Task<StudentDto> GetStudentByIdAsync(string id)
         {
-            var student = await _studentRepository.GetByIdAsync(id);
+            var studentRepository = _unitOfWork.Repository<Student>();
+            var student = await studentRepository.GetByIdAsync(id);
+
             if (student == null)
             {
-                throw new Exception("Student not found in system.");
+                throw new KeyNotFoundException("Student not found.");
             }
 
-            return new StudentDto
-            {
-                Id = student.Id.ToString(),
-                UserId = student.UserId.ToString(),
-                StudentCode = student.StudentCode,
-                Phone = student.Phone,
-                Address = student.Address,
-            };
+            return MapToStudentDto(student);
         }
+
         public async Task<StudentDto> GetStudentByStudentCodeAsync(string studentCode)
         {
-            var student = await _studentRepository.GetByStudentCodeAsync(studentCode);
+            var studentRepository = _unitOfWork.Repository<Student>();
+            var student = await studentRepository.FindOneAsync(s => s.StudentCode == studentCode);
+
             if (student == null)
             {
-                throw new Exception("Student not found in system.");
+                throw new KeyNotFoundException("Student not found.");
             }
 
-            return new StudentDto
-            {
-                Id = student.Id.ToString(),
-                UserId = student.UserId.ToString(),
-                StudentCode = student.StudentCode,
-                Phone = student.Phone,
-                Address = student.Address,
-            };
+            return MapToStudentDto(student);
         }
+
         public async Task<StudentDto> GetStudentByUserIdAsync(string userId)
         {
             if (!Guid.TryParse(userId, out var guidUserId))
@@ -109,34 +110,33 @@ namespace FPTStella.Application.Services
                 throw new ArgumentException("Invalid UserId format.");
             }
 
-            var student = await _studentRepository.GetByUserIdAsync(guidUserId);
+            var studentRepository = _unitOfWork.Repository<Student>();
+            var student = await studentRepository.FindOneAsync(s => s.UserId == guidUserId);
+
             if (student == null)
             {
-                throw new Exception("Student not found for this UserId.");
+                throw new KeyNotFoundException("Student not found for this UserId.");
             }
-            return new StudentDto
-            {
-                Id = student.Id.ToString(),
-                UserId = student.UserId.ToString(),
-                StudentCode = student.StudentCode,
-                Phone = student.Phone,
-                Address = student.Address,
-            };
+
+            return MapToStudentDto(student);
         }
+
         public async Task UpdateStudentAsync(string id, UpdateStudentDto updateStudentDto)
         {
-            var student = await _studentRepository.GetByIdAsync(id);
+            var studentRepository = _unitOfWork.Repository<Student>();
+            var student = await studentRepository.GetByIdAsync(id);
+
             if (student == null)
             {
-                throw new Exception("Student not found.");
+                throw new KeyNotFoundException("Student not found.");
             }
 
             if (student.StudentCode != updateStudentDto.StudentCode)
             {
-                var studentByCode = await _studentRepository.GetByStudentCodeAsync(updateStudentDto.StudentCode);
+                var studentByCode = await studentRepository.FindOneAsync(s => s.StudentCode == updateStudentDto.StudentCode);
                 if (studentByCode != null)
                 {
-                    throw new Exception("StudentCode already exists.");
+                    throw new InvalidOperationException("StudentCode already exists.");
                 }
             }
 
@@ -144,12 +144,15 @@ namespace FPTStella.Application.Services
             student.Phone = updateStudentDto.Phone;
             student.Address = updateStudentDto.Address;
 
-            await _studentRepository.ReplaceAsync(id, student);
+            await studentRepository.ReplaceAsync(id, student);
+            await _unitOfWork.SaveAsync();
         }
 
         public async Task DeleteStudentAsync(string id)
         {
-            await _studentRepository.DeleteAsync(id);
+            var studentRepository = _unitOfWork.Repository<Student>();
+            await studentRepository.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
         }
     }
 }
