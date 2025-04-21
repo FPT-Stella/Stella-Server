@@ -10,6 +10,7 @@ namespace FPTStella.Application.Common.Interfaces.Services
     public interface IProgramService 
     {
         Task<ProgramDto> CreateProgramAsync(CreateProgramDto createProgramDto);
+        Task<List<ProgramDto>> GetAllProgramsAsync();
         Task<ProgramDto> GetProgramByIdAsync(string id);
         Task<ProgramDto> GetProgramByProgramCodeAsync(string programCode);
         Task<ProgramDto> GetProgramByMajorIdAsync(Guid majorId);

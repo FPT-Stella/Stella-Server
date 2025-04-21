@@ -29,7 +29,19 @@ namespace FPTStella.API.Controllers
                 return HandleException(ex);
             }
         }
-
+        [HttpGet]
+        public async Task<IActionResult> GetAllPrograms()
+        {
+            try
+            {
+                var programs = await _programService.GetAllProgramsAsync();
+                return Ok(programs);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProgramById(string id)
         {

@@ -62,6 +62,13 @@ namespace FPTStella.Application.Services
 
             return MapToProgramDto(program);
         }
+        public async Task<List<ProgramDto>> GetAllProgramsAsync()
+        {
+            var programRepository = _unitOfWork.Repository<Programs>();
+            var programs = await programRepository.FilterByAsync(p => !p.DelFlg);
+
+            return programs.Select(MapToProgramDto).ToList();
+        }
         public async Task<ProgramDto> GetProgramByIdAsync(string id)
         {
             var programRepository = _unitOfWork.Repository<Programs>();
