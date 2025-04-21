@@ -17,13 +17,6 @@ namespace FPTStella.Infrastructure.UnitOfWorks.Repositories
         public Repository(IMongoDatabase database, string collectionName)
         {
             _collection = database.GetCollection<T>(collectionName);
-
-            if (typeof(T) == typeof(FPTStella.Domain.Entities.Account))
-            {
-                var indexKeys = Builders<T>.IndexKeys.Ascending("username");
-                var indexOptions = new CreateIndexOptions { Unique = true };
-                _collection.Indexes.CreateOne(new CreateIndexModel<T>(indexKeys, indexOptions));
-            }
         }
 
         public async Task<T?> GetByIdAsync(string id)

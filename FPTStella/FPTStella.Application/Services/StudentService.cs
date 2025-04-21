@@ -25,6 +25,7 @@ namespace FPTStella.Application.Services
             {
                 Id = student.Id.ToString(),
                 UserId = student.UserId.ToString(),
+                MajorId = student.MajorId.ToString(),
                 StudentCode = student.StudentCode,
                 Phone = student.Phone,
                 Address = student.Address,
@@ -39,6 +40,10 @@ namespace FPTStella.Application.Services
             if (!Guid.TryParse(createStudentDto.UserId, out var userId))
             {
                 throw new ArgumentException("Invalid UserId format.");
+            }
+            if (!Guid.TryParse(createStudentDto.MajorId, out var majorId))
+            {
+                throw new ArgumentException("Invalid MajorId format.");
             }
 
             var user = await accountRepository.GetByIdAsync(createStudentDto.UserId);
@@ -67,6 +72,7 @@ namespace FPTStella.Application.Services
             var student = new Student
             {
                 UserId = userId,
+                MajorId = majorId,
                 StudentCode = createStudentDto.StudentCode,
                 Phone = createStudentDto.Phone,
                 Address = createStudentDto.Address,

@@ -14,11 +14,14 @@ namespace FPTStella.Domain.Entities
         [BsonRepresentation(BsonType.String)]
         [BsonElement("user_id")]
         public Guid UserId { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        [BsonElement("major_id")]
+        public Guid MajorId { get; set; }
         [BsonElement("student_code")]
-        public string StudentCode { get; set; }
+        public string StudentCode { get; set; } = string.Empty;
         [BsonElement("phone")]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = string.Empty;
         [BsonElement("address")]
-        public string Address { get; set; }
+        public string Address { get; set; } = string.Empty;
     }
 }

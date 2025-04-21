@@ -17,6 +17,13 @@ namespace FPTStella.Infrastructure.Data
         public AccountRepository(IMongoDatabase database)
              : base(database, nameof(Account)) 
         {
+            // index unique cho username
+            var indexKeys = Builders<Account>.IndexKeys.Ascending("username");
+            var indexOptions = new CreateIndexOptions { Unique = true };
+            Collection.Indexes.CreateOne(new CreateIndexModel<Account>(indexKeys, indexOptions));
+            // index unique cho email
+            var emailIndexKeys = Builders<Account>.IndexKeys.Ascending("email");
+            Collection.Indexes.CreateOne(new CreateIndexModel<Account>(emailIndexKeys, indexOptions));
         }
 
         public async Task<Account?> GetByUsernameAsync(string username)

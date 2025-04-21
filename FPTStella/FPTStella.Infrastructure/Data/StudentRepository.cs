@@ -24,6 +24,10 @@ namespace FPTStella.Infrastructure.Data
             // Tạo index cho user_id
             var userIdIndexKeys = Builders<Student>.IndexKeys.Ascending("user_id");
             Collection.Indexes.CreateOne(new CreateIndexModel<Student>(userIdIndexKeys));
+
+            // Tạo index cho major_id
+            var majorIdIndexKeys = Builders<Student>.IndexKeys.Ascending("major_id");
+            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(majorIdIndexKeys));
         }
 
         public async Task<Student?> GetByStudentCodeAsync(string studentCode)
