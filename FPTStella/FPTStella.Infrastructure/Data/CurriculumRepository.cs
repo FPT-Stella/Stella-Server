@@ -35,46 +35,46 @@ namespace FPTStella.Infrastructure.Data
                 Builders<Curriculums>.IndexKeys.Ascending(c => c.CurriculumName),
                 new CreateIndexOptions { Background = true }
             );
-            Collection.Indexes.CreateMany(new[] { curriculumCodeIndex, programIdIndex });
+            _collection.Indexes.CreateMany(new[] { curriculumCodeIndex, programIdIndex });
         }
         public async Task<Curriculums?> GetByCurriculumCodeAsync(string curriculumCode)
         {
             var filter = Builders<Curriculums>.Filter.Eq(c => c.CurriculumCode, curriculumCode) & NotDeletedFilter;
-            return await Collection.Find(filter).FirstOrDefaultAsync();
+            return await _collection.Find(filter).FirstOrDefaultAsync();
         }
         public async Task<List<Curriculums>> GetByProgramIdAsync(Guid programId)
         {
             var filter = Builders<Curriculums>.Filter.Eq(c => c.ProgramId, programId) & NotDeletedFilter;
-            return await Collection.Find(filter).ToListAsync();
+            return await _collection.Find(filter).ToListAsync();
         }
         public async Task<Curriculums?> GetByCurriculumNameAsync(string curriculumName)
         {
             var filter = Builders<Curriculums>.Filter.Eq(c => c.CurriculumName, curriculumName) & NotDeletedFilter;
-            return await Collection.Find(filter).FirstOrDefaultAsync();
+            return await _collection.Find(filter).FirstOrDefaultAsync();
         }
         public async Task<bool> IsCurriculumCodeExisted(string curriculumCode)
         {
             var filter = Builders<Curriculums>.Filter.Eq(c => c.CurriculumCode, curriculumCode) & NotDeletedFilter;
-            return await Collection.CountDocumentsAsync(filter) > 0;
+            return await _collection.CountDocumentsAsync(filter) > 0;
         }
         public async Task<bool> IsCurriculumNameExisted(string curriculumName)
         {
             var filter = Builders<Curriculums>.Filter.Eq(c => c.CurriculumName, curriculumName) & NotDeletedFilter;
-            return await Collection.CountDocumentsAsync(filter) > 0;
+            return await _collection.CountDocumentsAsync(filter) > 0;
         }
         public async Task<bool> IsCurriculumCodeExisted(string curriculumCode, Guid id)
         {
             var filter = Builders<Curriculums>.Filter.Eq(c => c.CurriculumCode, curriculumCode)
                          & NotDeletedFilter
                          & Builders<Curriculums>.Filter.Ne(c => c.Id, id);
-            return await Collection.CountDocumentsAsync(filter) > 0;
+            return await _collection.CountDocumentsAsync(filter) > 0;
         }
         public async Task<bool> IsCurriculumNameExisted(string curriculumName, Guid id)
         {
             var filter = Builders<Curriculums>.Filter.Eq(c => c.CurriculumName, curriculumName)
                          & NotDeletedFilter
                          & Builders<Curriculums>.Filter.Ne(c => c.Id, id);
-            return await Collection.CountDocumentsAsync(filter) > 0;
+            return await _collection.CountDocumentsAsync(filter) > 0;
         }
     }
 }

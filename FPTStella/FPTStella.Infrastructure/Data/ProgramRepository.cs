@@ -15,12 +15,12 @@ namespace FPTStella.Infrastructure.Data
         public ProgramRepository(IMongoDatabase database) : base(database, "Programs")
         {
             // Index duy nhất cho program_code
-            Collection.Indexes.CreateOne(new CreateIndexModel<Programs>(
+            _collection.Indexes.CreateOne(new CreateIndexModel<Programs>(
                 Builders<Programs>.IndexKeys.Ascending(p => p.ProgramCode),
                 new CreateIndexOptions { Unique = true }));
 
             // Index tìm theo major_id
-            Collection.Indexes.CreateOne(new CreateIndexModel<Programs>(
+            _collection.Indexes.CreateOne(new CreateIndexModel<Programs>(
                 Builders<Programs>.IndexKeys.Ascending(p => p.MajorId)));
         }
         public async Task<Programs?> GetByProgramCodeAsync(string programCode)

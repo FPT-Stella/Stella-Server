@@ -18,12 +18,12 @@ namespace FPTStella.Infrastructure.Data
              : base(database, nameof(Account)) 
         {
             // Index duy nhất cho username
-            Collection.Indexes.CreateOne(new CreateIndexModel<Account>(
+            _collection.Indexes.CreateOne(new CreateIndexModel<Account>(
                 Builders<Account>.IndexKeys.Ascending(a => a.Username),
                 new CreateIndexOptions { Unique = true }));
 
             // Index duy nhất cho email
-            Collection.Indexes.CreateOne(new CreateIndexModel<Account>(
+            _collection.Indexes.CreateOne(new CreateIndexModel<Account>(
                 Builders<Account>.IndexKeys.Ascending(a => a.Email),
                 new CreateIndexOptions { Unique = true }));
         }

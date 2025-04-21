@@ -11,25 +11,25 @@ namespace FPTStella.Contracts.DTOs.Users
     {
         [Required]
         [StringLength(50)]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         [Required]
         [StringLength(255)]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
     ErrorMessage = "Password must be at least 8 characters, include uppercase, lowercase, number, and special character.")]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         [Required]
         [StringLength(20)]
-        public string Role { get; set; }
+        public string Role { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100)]
-        public string FullName { get; set; }
+        public string FullName { get; set; } = string.Empty;
 
         [Required]
         [EmailAddress]
         [StringLength(100)]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
     }
 }

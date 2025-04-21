@@ -17,14 +17,14 @@ namespace FPTStella.Infrastructure.Data
             // Tạo index unique cho major_name
             var indexKeys = Builders<Majors>.IndexKeys.Ascending("major_name");
             var indexOptions = new CreateIndexOptions { Unique = true };
-            Collection.Indexes.CreateOne(new CreateIndexModel<Majors>(indexKeys, indexOptions));
+            _collection.Indexes.CreateOne(new CreateIndexModel<Majors>(indexKeys, indexOptions));
         }
         public async Task<Majors?> GetByMajorNameAsync(string majorName)
         {
             var filter = Builders<Majors>.Filter.Eq(m => m.MajorName, majorName) &
                          Builders<Majors>.Filter.Eq(m => m.DelFlg, false);
 
-            return await Collection.Find(filter).FirstOrDefaultAsync();
+            return await _collection.Find(filter).FirstOrDefaultAsync();
         }
     }
 }

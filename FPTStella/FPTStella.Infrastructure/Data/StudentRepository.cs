@@ -17,16 +17,16 @@ namespace FPTStella.Infrastructure.Data
         public StudentRepository(IMongoDatabase database) : base(database, "Students")
         {
             // Index duy nhất cho student_code
-            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(
+            _collection.Indexes.CreateOne(new CreateIndexModel<Student>(
                 Builders<Student>.IndexKeys.Ascending(s => s.StudentCode),
                 new CreateIndexOptions { Unique = true }));
 
             // Index cho user_id
-            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(
+            _collection.Indexes.CreateOne(new CreateIndexModel<Student>(
                 Builders<Student>.IndexKeys.Ascending(s => s.UserId)));
 
             // Index cho major_id
-            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(
+            _collection.Indexes.CreateOne(new CreateIndexModel<Student>(
                 Builders<Student>.IndexKeys.Ascending(s => s.MajorId)));
         }
 
