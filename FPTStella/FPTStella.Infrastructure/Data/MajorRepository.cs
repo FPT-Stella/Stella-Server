@@ -21,7 +21,9 @@ namespace FPTStella.Infrastructure.Data
         }
         public async Task<Majors?> GetByMajorNameAsync(string majorName)
         {
-            var filter = Builders<Majors>.Filter.Eq("major_name", majorName) & Builders<Majors>.Filter.Eq("del_flg", false);
+            var filter = Builders<Majors>.Filter.Eq(m => m.MajorName, majorName) &
+                         Builders<Majors>.Filter.Eq(m => m.DelFlg, false);
+
             return await Collection.Find(filter).FirstOrDefaultAsync();
         }
     }

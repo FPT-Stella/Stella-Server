@@ -16,30 +16,28 @@ namespace FPTStella.Infrastructure.Data
     {
         public StudentRepository(IMongoDatabase database) : base(database, "Students")
         {
-            // Tạo index unique cho student_code
-            var indexKeys = Builders<Student>.IndexKeys.Ascending("student_code");
-            var indexOptions = new CreateIndexOptions { Unique = true };
-            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(indexKeys, indexOptions));
+            // Index duy nhất cho student_code
+            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(
+                Builders<Student>.IndexKeys.Ascending(s => s.StudentCode),
+                new CreateIndexOptions { Unique = true }));
 
-            // Tạo index cho user_id
-            var userIdIndexKeys = Builders<Student>.IndexKeys.Ascending("user_id");
-            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(userIdIndexKeys));
+            // Index cho user_id
+            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(
+                Builders<Student>.IndexKeys.Ascending(s => s.UserId)));
 
-            // Tạo index cho major_id
-            var majorIdIndexKeys = Builders<Student>.IndexKeys.Ascending("major_id");
-            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(majorIdIndexKeys));
+            // Index cho major_id
+            Collection.Indexes.CreateOne(new CreateIndexModel<Student>(
+                Builders<Student>.IndexKeys.Ascending(s => s.MajorId)));
         }
 
         public async Task<Student?> GetByStudentCodeAsync(string studentCode)
         {
-            var filter = Builders<Student>.Filter.Eq("student_code", studentCode) & Builders<Student>.Filter.Eq("del_flg", false);
-            return await Collection.Find(filter).FirstOrDefaultAsync();
+            return await FindOneAsync(s => s.StudentCode == studentCode && s.DelFlg == false);
         }
 
         public async Task<Student?> GetByUserIdAsync(Guid userId)
         {
-            var filter = Builders<Student>.Filter.Eq("user_id", userId) & Builders<Student>.Filter.Eq("del_flg", false);
-            return await Collection.Find(filter).FirstOrDefaultAsync();
+            return await FindOneAsync(s => s.UserId == userId && s.DelFlg == false);
         }
     }
 }

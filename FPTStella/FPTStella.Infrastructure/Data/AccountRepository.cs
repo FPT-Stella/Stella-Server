@@ -17,43 +17,42 @@ namespace FPTStella.Infrastructure.Data
         public AccountRepository(IMongoDatabase database)
              : base(database, nameof(Account)) 
         {
-            // index unique cho username
-            var indexKeys = Builders<Account>.IndexKeys.Ascending("username");
-            var indexOptions = new CreateIndexOptions { Unique = true };
-            Collection.Indexes.CreateOne(new CreateIndexModel<Account>(indexKeys, indexOptions));
-            // index unique cho email
-            var emailIndexKeys = Builders<Account>.IndexKeys.Ascending("email");
-            Collection.Indexes.CreateOne(new CreateIndexModel<Account>(emailIndexKeys, indexOptions));
+            // Index duy nhất cho username
+            Collection.Indexes.CreateOne(new CreateIndexModel<Account>(
+                Builders<Account>.IndexKeys.Ascending(a => a.Username),
+                new CreateIndexOptions { Unique = true }));
+
+            // Index duy nhất cho email
+            Collection.Indexes.CreateOne(new CreateIndexModel<Account>(
+                Builders<Account>.IndexKeys.Ascending(a => a.Email),
+                new CreateIndexOptions { Unique = true }));
         }
 
         public async Task<Account?> GetByUsernameAsync(string username)
         {
-            return await FindOneAsync(u => u.Username == username);
+            return await FindOneAsync(a => a.Username == username);
         }
 
         public async Task<Account?> GetByEmailAsync(string email)
         {
-            return await FindOneAsync(u => u.Email == email);
+            return await FindOneAsync(a => a.Email == email);
         }
 
         public async Task<Account> FindOrCreateGoogleUserAsync(string email, string fullName)
         {
-            var user = await GetByEmailAsync(email);
-            if (user != null)
-            {
-                return user;
-            }
+            var account = await GetByEmailAsync(email);
+            if (account != null) return account;
 
-            user = new Account
+            account = new Account
             {
                 Username = email.Split('@')[0],
                 Email = email,
                 FullName = fullName,
-                Role = Role.Student,
+                Role = Role.Student
             };
 
-            await InsertAsync(user);
-            return user;
+            await InsertAsync(account);
+            return account;
         }
     }
 }
