@@ -36,11 +36,13 @@ builder.Services.AddSingleton<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<IAccountRepository, AccountRepository>();
 builder.Services.AddSingleton<IStudentRepository, StudentRepository>();
 builder.Services.AddSingleton<IMajorRepository, MajorRepository>();
+builder.Services.AddSingleton<IProgramRepository, ProgramRepository>();
 
 // Đăng ký DI cho Application
 builder.Services.AddSingleton<IAccountService, AccountService>();
 builder.Services.AddSingleton<IStudentService, StudentService>();
 builder.Services.AddSingleton<IMajorService, MajorService>();
+builder.Services.AddSingleton<IProgramService, ProgramService>();
 
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
