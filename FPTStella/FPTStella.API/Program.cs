@@ -39,6 +39,9 @@ builder.Services.AddSingleton<IMajorRepository, MajorRepository>();
 builder.Services.AddSingleton<IProgramRepository, ProgramRepository>();
 builder.Services.AddSingleton<ICurriculumRepository, CurriculumRepository>();
 builder.Services.AddSingleton<ISubjectRepository, SubjectRepository>();
+builder.Services.AddSingleton<IPO_PLO_MappingRepository, PO_PLO_MappingRepository>();
+builder.Services.AddSingleton<IPLORepository, PLORepository>();
+builder.Services.AddSingleton<IPORepository, PORepository>();
 
 // Đăng ký DI cho Application
 builder.Services.AddSingleton<IAccountService, AccountService>();
@@ -47,6 +50,10 @@ builder.Services.AddSingleton<IMajorService, MajorService>();
 builder.Services.AddSingleton<IProgramService, ProgramService>();
 builder.Services.AddSingleton<ICurriculumService, CurriculumService>();
 builder.Services.AddSingleton<ISubjectService, SubjectService>();
+builder.Services.AddSingleton<IPO_PLO_MappingService, PO_PLO_MappingService>();
+builder.Services.AddSingleton<IPOService, POService>();
+builder.Services.AddSingleton<IPO_PLO_MappingService, PO_PLO_MappingService>();
+builder.Services.AddSingleton<IPLOService, PLOService>();
 
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
