@@ -15,16 +15,28 @@ namespace FPTStella.Infrastructure.UnitOfWorks
     {
         private readonly IMongoDatabase _database;
         private readonly ConcurrentDictionary<Type, object> _repositories;
+        private readonly IServiceProvider _serviceProvider;
         private bool _disposed;
 
-        public UnitOfWork(IMongoDatabase database)
+        public UnitOfWork(IMongoDatabase database, IServiceProvider serviceProvider)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _repositories = new ConcurrentDictionary<Type, object>();
         }
 
         public IRepository<TEntity> Repository<TEntity>() where TEntity : class
         {
+            // Try to get specialized repository first
+            var repositoryType = typeof(IRepository<>).MakeGenericType(typeof(TEntity));
+            var specializedRepo = _serviceProvider.GetService(repositoryType);
+
+            if (specializedRepo != null)
+            {
+                return (IRepository<TEntity>)specializedRepo;
+            }
+
+            // Fall back to generic repository
             return (IRepository<TEntity>)_repositories.GetOrAdd(typeof(TEntity), _ =>
                 new Repository<TEntity>(_database, typeof(TEntity).Name));
         }

@@ -35,7 +35,6 @@ namespace FPTStella.Application.Common.Interfaces.Services
         /// <returns>Danh sách CurriculumDto.</returns>
         Task<List<CurriculumDto>> GetAllCurriculumsAsync();
 
-
         /// <summary>
         /// Lấy thông tin Curriculum theo tên CurriculumName.
         /// </summary>

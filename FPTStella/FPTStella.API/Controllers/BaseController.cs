@@ -9,7 +9,6 @@ namespace FPTStella.API.Controllers
     {
         protected IActionResult HandleException(Exception ex)
         {
-            // Log lỗi tại đây nếu cần (ví dụ: sử dụng ILogger)
             if (ex is KeyNotFoundException)
             {
                 return NotFound(new { Message = ex.Message });
