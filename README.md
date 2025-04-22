@@ -10,7 +10,7 @@ Bạn có thể xem tài liệu API tại: [Swagger UI](http://103.179.185.152:5
 
 ## Mục lục 📚
 
-- [Kiến trúc dự án](#kiến-trúc-dự-án)
+- [Cấu trúc dự án](#cấu-trúc-thư-mục)
 - [Ý nghĩa của các tầng](#ý-nghĩa-của-các-tầng)
 - [Yêu cầu cài đặt](#yêu-cầu-cài-đặt)
 - [Hướng dẫn setup](#hướng-dẫn-setup)
@@ -18,15 +18,16 @@ Bạn có thể xem tài liệu API tại: [Swagger UI](http://103.179.185.152:5
 - [Đóng góp](#đóng-góp)
 - [Giấy phép](#giấy-phép)
 
-## Kiến trúc dự án 🛠️
-
-Dự án được xây dựng theo **kiến trúc phân tầng (Layered Architecture)**, giúp tách biệt các trách nhiệm và tăng tính bảo trì, mở rộng của hệ thống. Cấu trúc thư mục chính bao gồm:
-
-- **FPTStella.Domain**: Chứa các entity và logic nghiệp vụ cốt lõi.
-- **FPTStella.Application**: Chứa các service và logic ứng dụng.
-- **FPTStella.Infrastructure**: Chứa các triển khai liên quan đến cơ sở hạ tầng (database, persistence).
-- **FPTStella.Api**: Chứa các controller và cấu hình API.
-
+## 🏗️ **Cấu trúc thư mục**
+Code
+```
+FPTStella/
+├── FPTStella.API/             # Lớp API - cung cấp các endpoint cho client
+├── FPTStella.Application/     # Lớp ứng dụng - xử lý logic nghiệp vụ
+├── FPTStella.Domain/          # Lớp domain - định nghĩa các thực thể và quy tắc nghiệp vụ
+├── FPTStella.Infrastructure/  # Lớp hạ tầng - quản lý truy cập dữ liệu và repository
+└── Tests/                     # Thư mục chứa các bài kiểm thử đơn vị và tích hợp
+```
 ## 🍀 Ý nghĩa của các tầng 🍀
 
 ### 1. Domain Layer (`FPTStella.Domain`)
