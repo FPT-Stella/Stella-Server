@@ -15,6 +15,19 @@ namespace FPTStella.API.Controllers
         {
             _studentService = studentService;
         }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllStudents()
+        {
+            try
+            {
+                var studentDtos = await _studentService.GetAllStudentsAsync();
+                return Ok(studentDtos);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> CreateStudent([FromBody] CreateStudentDto createStudentDto)
         {

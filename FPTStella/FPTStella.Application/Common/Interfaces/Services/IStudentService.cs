@@ -15,5 +15,6 @@ namespace FPTStella.Application.Common.Interfaces.Services
         Task<StudentDto> GetStudentByUserIdAsync(string userId);
         Task UpdateStudentAsync(string id, UpdateStudentDto updateStudentDto);
         Task DeleteStudentAsync(string id);
+        Task<List<StudentDto>> GetAllStudentsAsync();
     }
 }
