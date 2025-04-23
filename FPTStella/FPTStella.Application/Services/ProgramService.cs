@@ -168,6 +168,7 @@ namespace FPTStella.Application.Services
                     throw new InvalidOperationException("ProgramName already exists.");
                 }
             }
+            program.MajorId = program.MajorId;
             program.ProgramCode = updateProgramDto.ProgramCode;
             program.ProgramName = updateProgramDto.ProgramName;
             program.Description = updateProgramDto.Description;
