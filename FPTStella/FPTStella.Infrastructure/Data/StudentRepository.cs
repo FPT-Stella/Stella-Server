@@ -39,5 +39,6 @@ namespace FPTStella.Infrastructure.Data
         {
             return await FindOneAsync(s => s.UserId == userId && s.DelFlg == false);
         }
+
     }
 }

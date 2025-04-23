@@ -8,7 +8,7 @@ namespace FPTStella.Contracts.DTOs.Programs
 {
     public class UpdateProgramDto
     {
-        public required string MajorId { get; set; }
+        public required Guid? MajorId { get; set; }
         public required string ProgramCode { get; set; }
         public required string ProgramName { get; set; }
         public required string Description { get; set; } = string.Empty;

@@ -160,5 +160,11 @@ namespace FPTStella.Application.Services
             await studentRepository.DeleteAsync(id);
             await _unitOfWork.SaveAsync();
         }
+        public async Task<List<StudentDto>> GetAllStudentsAsync()
+        {
+            var studentRepository = _unitOfWork.Repository<Student>();
+            var students = await studentRepository.GetAllAsync();
+            return students.Select(MapToStudentDto).ToList();
+        }
     }
 }
