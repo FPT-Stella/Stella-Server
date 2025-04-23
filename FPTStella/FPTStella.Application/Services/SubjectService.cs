@@ -63,7 +63,7 @@ namespace FPTStella.Application.Services
             return await _subjectRepository.GetSubjectsByDegreeLevelAsync(degreeLevel);
         }
 
-        public async Task CreateSubjectAsync(CreateSubjectDto subject)
+        public async Task<SubjectDto> CreateSubjectAsync(CreateSubjectDto subject)
         {
             var repo = _unitOfWork.Repository<Subjects>();
 
@@ -93,6 +93,7 @@ namespace FPTStella.Application.Services
 
             await repo.InsertAsync(subjectEntity);
             await _unitOfWork.SaveAsync();
+            return MapToSubjectDto(subjectEntity);
         }
 
         public async Task<Subjects?> GetBySubjectCodeAsync(string subjectCode)
