@@ -168,10 +168,10 @@ namespace FPTStella.Application.Services
                     throw new InvalidOperationException("ProgramName already exists.");
                 }
             }
-            program.MajorId = program.MajorId;
-            program.ProgramCode = updateProgramDto.ProgramCode;
-            program.ProgramName = updateProgramDto.ProgramName;
-            program.Description = updateProgramDto.Description;
+            program.MajorId = updateProgramDto.MajorId ?? program.MajorId;
+            program.ProgramCode = updateProgramDto.ProgramCode ?? program.ProgramCode;
+            program.ProgramName = updateProgramDto.ProgramName ?? program.ProgramName;
+            program.Description = updateProgramDto.Description ?? program.Description;
 
             await programRepository.ReplaceAsync(id, program);
             await _unitOfWork.SaveAsync();

@@ -5,7 +5,7 @@ namespace FPTStella.Application.Common.Interfaces.Services
 {
     public interface IAccountService
     {
-        Task<UserDto> CreateUserAsync(CreateUserDto createUserDto);
+        Task<UserWithTokenDto> CreateUserAsync(CreateUserDto createUserDto);
         Task<IEnumerable<UserDto>> GetAllUsersAsync();
         Task<UserDto> FindOrCreateGoogleUserAsync(string email, string fullName);
         Task<UserDto> GetUserByIdAsync(string id);
