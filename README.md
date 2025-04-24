@@ -6,7 +6,7 @@
 
 **Stella Server** là backend của hệ thống FPT Stella, một ứng dụng quản lý sinh viên và người dùng được xây dựng với kiến trúc phân tầng (layered architecture) sử dụng .NET 8.0 và MongoDB. Dự án cung cấp các API RESTful để xử lý các nghiệp vụ liên quan đến quản lý sinh viên, người dùng, và các thực thể khác trong hệ thống.
 
-Bạn có thể xem tài liệu API tại: [Swagger UI](http://103.179.185.152:5000/swagger/index.html).
+Bạn có thể xem tài liệu API tại: [Swagger UI](https://stella.dacoban.studio/swagger/index.html).
 
 ## Mục lục 📚
 
