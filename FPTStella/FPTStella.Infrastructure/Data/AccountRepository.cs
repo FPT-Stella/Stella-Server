@@ -1,7 +1,7 @@
 ﻿using FPTStella.Application.Common.Interfaces.Repositories;
 using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Domain.Entities;
-using FPTStella.Domain.Enum;
+using FPTStella.Domain.Enums;
 using FPTStella.Infrastructure.UnitOfWorks.Repositories;
 using MongoDB.Driver;
 using System;

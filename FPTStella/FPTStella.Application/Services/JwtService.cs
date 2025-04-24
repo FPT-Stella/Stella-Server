@@ -1,4 +1,6 @@
 ﻿using FPTStella.Application.Common.Interfaces.Jwt;
+using FPTStella.Contracts.DTOs.Jwt;
+using FPTStella.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -115,5 +117,46 @@ namespace FPTStella.Application.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        public string GenerateJwtToken(Account account)
+        {
+            if (account == null) throw new ArgumentNullException(nameof(account));
+            if (string.IsNullOrWhiteSpace(account.Email)) throw new ArgumentException("Email is required.");
+            if (account.Role == null) throw new ArgumentException("Role is required."); // Updated to check for null Role enum
+
+            var secret = _configuration["JwtSettings:AccessSecretToken"];
+            if (string.IsNullOrWhiteSpace(secret)) throw new InvalidOperationException("Access token secret is not configured.");
+
+            var issuer = _configuration["JwtSettings:Issuer"] ?? throw new InvalidOperationException("Issuer is not configured.");
+            var audience = _configuration["JwtSettings:Audience"] ?? throw new InvalidOperationException("Audience is not configured.");
+            var lifetime = _configuration["JwtSettings:AccessTokenExpMinute"];
+
+            if (!int.TryParse(lifetime, out var expiresInMinutes))
+            {
+                throw new InvalidOperationException("Invalid access token lifetime.");
+            }
+
+            var claims = new[]
+            {
+                new Claim("id", account.Id.ToString()),
+                new Claim("email", account.Email),
+                new Claim("role", account.Role.ToString()), // Convert Role enum to string
+                new Claim("username", account.Username),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("type", "access")
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(expiresInMinutes),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
     }
 }

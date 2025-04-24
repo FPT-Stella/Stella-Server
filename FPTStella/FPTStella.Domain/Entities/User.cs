@@ -1,5 +1,5 @@
 ﻿using FPTStella.Domain.Common;
-using FPTStella.Domain.Enum;
+using FPTStella.Domain.Enums;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;

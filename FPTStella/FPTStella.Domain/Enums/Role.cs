@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FPTStella.Domain.Enum
+namespace FPTStella.Domain.Enums
 {
     public enum Role
     {

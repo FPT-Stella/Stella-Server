@@ -1,8 +1,10 @@
 ﻿using FPTStella.Application.Common.Interfaces.Repositories;
 using FPTStella.Application.Common.Interfaces.Services;
 using FPTStella.Application.Common.Interfaces.UnitOfWorks;
+using FPTStella.Application.Utils;
 using FPTStella.Contracts.DTOs.Students;
 using FPTStella.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,35 +34,27 @@ namespace FPTStella.Application.Services
             };
         }
 
-        public async Task<StudentDto> CreateStudentAsync(CreateStudentDto createStudentDto)
+        public async Task<StudentDto> CreateStudentAsync(CreateStudentDto createStudentDto,HttpContext http)
         {
             var studentRepository = _unitOfWork.Repository<Student>();
             var accountRepository = _unitOfWork.Repository<Account>();
+            var majorRepository = _unitOfWork.Repository<Majors>();
+            var accountId = UserUtil.GetAccountId(http);
 
-            if (!Guid.TryParse(createStudentDto.UserId, out var userId))
-            {
-                throw new ArgumentException("Invalid UserId format.");
-            }
             if (!Guid.TryParse(createStudentDto.MajorId, out var majorId))
             {
                 throw new ArgumentException("Invalid MajorId format.");
             }
 
-            var user = await accountRepository.GetByIdAsync(createStudentDto.UserId);
+            var user = await accountRepository.GetByIdAsync(accountId.ToString());
             if (user == null)
             {
                 throw new KeyNotFoundException("User not found.");
             }
 
-            if (user.Role != FPTStella.Domain.Enum.Role.Student)
+            if (user.Role != FPTStella.Domain.Enums.Role.Student)
             {
                 throw new InvalidOperationException("User must have role 'Student' to create a Student record.");
-            }
-
-            var existingStudent = await studentRepository.FindOneAsync(s => s.UserId == userId);
-            if (existingStudent != null)
-            {
-                throw new InvalidOperationException("A Student record already exists for this UserId.");
             }
 
             var studentByCode = await studentRepository.FindOneAsync(s => s.StudentCode == createStudentDto.StudentCode);
@@ -68,10 +62,16 @@ namespace FPTStella.Application.Services
             {
                 throw new InvalidOperationException("StudentCode already exists.");
             }
+            var major = await majorRepository.GetByIdAsync(majorId.ToString());
+            if (major == null)
+            {
+                throw new KeyNotFoundException("Major not found.");
+            }
+
 
             var student = new Student
             {
-                UserId = userId,
+                UserId = (Guid)accountId,
                 MajorId = majorId,
                 StudentCode = createStudentDto.StudentCode,
                 Phone = createStudentDto.Phone,

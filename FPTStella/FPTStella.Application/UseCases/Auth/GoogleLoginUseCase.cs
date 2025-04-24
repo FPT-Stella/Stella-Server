@@ -2,6 +2,8 @@
 using FPTStella.Application.Common.Interfaces.Jwt;
 using FPTStella.Application.Common.Interfaces.Services;
 using FPTStella.Contracts.DTOs.Google;
+using FPTStella.Domain.Entities;
+using FPTStella.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -44,9 +46,16 @@ namespace FPTStella.Application.UseCases.Auth
 
             // Tìm hoặc tạo user
             var userDto = await _userService.FindOrCreateGoogleUserAsync(tokenInfo.Email, tokenInfo.Name);
+            var acc = new Account
+            {
+                Id = Guid.Parse(userDto.Id), // Fix: Convert string to Guid using Guid.Parse
+                Username = userDto.Username,
+                Email = userDto.Email,
+                Role = Enum.TryParse<Role>(userDto.Role, out var parsedRole) ? parsedRole : throw new Exception("Invalid role") // Fix: Convert string to Role enum
+            };
 
             // Sinh token
-            var accessToken = _jwtService.GenerateAccessToken(userDto.Email, userDto.Role);
+            var accessToken = _jwtService.GenerateJwtToken(acc);
             var refreshToken = _jwtService.GenerateRefreshToken(userDto.Email, userDto.Role);
 
             return new GoogleLoginResponse

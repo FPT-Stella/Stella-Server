@@ -46,7 +46,7 @@ builder.Services.AddSingleton<ISubjectInCurriculumRepository, SubjectInCurriculu
 
 
 // Đăng ký DI cho Application
-builder.Services.AddSingleton<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddSingleton<IStudentService, StudentService>();
 builder.Services.AddSingleton<IMajorService, MajorService>();
 builder.Services.AddSingleton<IProgramService, ProgramService>();
