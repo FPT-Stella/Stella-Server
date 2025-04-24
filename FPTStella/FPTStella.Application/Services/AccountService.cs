@@ -3,18 +3,21 @@ using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Domain.Entities;
 using BCrypt.Net;
 using FPTStella.Contracts.DTOs.Users;
-using FPTStella.Domain.Enum;
+using FPTStella.Domain.Enums;
 using FPTStella.Application.Common.Interfaces.Repositories;
+using FPTStella.Application.Common.Interfaces.Jwt;
 
 namespace FPTStella.Application.Services
 {
     public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IJwtService _jwtService;
 
-        public AccountService(IUnitOfWork unitOfWork)
+        public AccountService(IUnitOfWork unitOfWork, IJwtService jwtService )
         {
             _unitOfWork = unitOfWork;
+            _jwtService = jwtService;
         }
 
         private static UserDto MapToUserDto(Account user)
@@ -29,7 +32,7 @@ namespace FPTStella.Application.Services
             };
         }
 
-        public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto)
+        public async Task<UserWithTokenDto> CreateUserAsync(CreateUserDto createUserDto)
         {
             var accountRepository = _unitOfWork.Repository<Account>();
 
@@ -39,12 +42,17 @@ namespace FPTStella.Application.Services
             {
                 throw new Exception("Username already exists.");
             }
+            var existingEmail = await accountRepository.FindOneAsync(u => u.Email == createUserDto.Email);
+            if (existingEmail != null)
+            {
+                throw new Exception("Email already exists.");
+            }
 
             var user = new Account
             {
                 Username = createUserDto.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password),
-                Role = Enum.Parse<Role>(createUserDto.Role),
+                Role = Role.Student,
                 FullName = createUserDto.FullName,
                 Email = createUserDto.Email,
             };
@@ -52,7 +60,14 @@ namespace FPTStella.Application.Services
             await accountRepository.InsertAsync(user);
             await _unitOfWork.SaveAsync();
 
-            return MapToUserDto(user);
+            // Pass the 'user' object to GenerateJwtToken as required by its signature
+            var token = _jwtService.GenerateJwtToken(user);
+
+            return new UserWithTokenDto
+            {
+                User = MapToUserDto(user),
+                Token = token
+            };
         }
 
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
@@ -121,11 +136,15 @@ namespace FPTStella.Application.Services
                 throw new Exception("User not found.");
             }
 
-            user.Username = updateUserDto.Username;
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateUserDto.Password);
-            user.Role = Enum.Parse<Role>(updateUserDto.Role);
-            user.FullName = updateUserDto.FullName;
-            user.Email = updateUserDto.Email;
+            // Convert the string 'id' to Guid for comparison
+            var userIdGuid = Guid.Parse(id);
+            var existingUser = await accountRepository.FindOneAsync(u => u.Username == updateUserDto.Username && u.Id != userIdGuid);
+
+            user.Username = !string.IsNullOrWhiteSpace(updateUserDto.Username) ? updateUserDto.Username : user.Username;
+            user.PasswordHash = !string.IsNullOrWhiteSpace(updateUserDto.Password) ? BCrypt.Net.BCrypt.HashPassword(updateUserDto.Password) : user.PasswordHash;
+            user.FullName = !string.IsNullOrWhiteSpace(updateUserDto.FullName) ? updateUserDto.FullName : user.FullName;
+            user.Email = !string.IsNullOrWhiteSpace(updateUserDto.Email) ? updateUserDto.Email : user.Email;
+
 
             await accountRepository.ReplaceAsync(id, user);
             await _unitOfWork.SaveAsync();
