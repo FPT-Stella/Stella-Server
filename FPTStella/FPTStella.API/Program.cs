@@ -42,6 +42,8 @@ builder.Services.AddSingleton<ISubjectRepository, SubjectRepository>();
 builder.Services.AddSingleton<IPO_PLO_MappingRepository, PO_PLO_MappingRepository>();
 builder.Services.AddSingleton<IPLORepository, PLORepository>();
 builder.Services.AddSingleton<IPORepository, PORepository>();
+builder.Services.AddSingleton<ISubjectInCurriculumRepository, SubjectInCurriculumRepository>();
+
 
 // Đăng ký DI cho Application
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -54,6 +56,7 @@ builder.Services.AddSingleton<IPO_PLO_MappingService, PO_PLO_MappingService>();
 builder.Services.AddSingleton<IPOService, POService>();
 builder.Services.AddSingleton<IPO_PLO_MappingService, PO_PLO_MappingService>();
 builder.Services.AddSingleton<IPLOService, PLOService>();
+builder.Services.AddSingleton<ISubjectInCurriculumService, SubjectInCurriculumService>();
 
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
@@ -85,7 +88,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Aventa", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "✨ FPT Stella ✨", Version = "v1.2.1" });
 
     // Cấu hình Bearer token 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
