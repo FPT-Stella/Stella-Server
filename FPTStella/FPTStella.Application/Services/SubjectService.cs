@@ -181,8 +181,6 @@ namespace FPTStella.Application.Services
 
             return true;
         }
-
-
         public async Task<bool> DeleteSubjectAsync(string id)
         {
             var repo = _unitOfWork.Repository<Subjects>();
