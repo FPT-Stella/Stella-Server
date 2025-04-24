@@ -33,7 +33,7 @@ namespace FPTStella.API.Controllers
         {
             try
             {
-                var studentDto = await _studentService.CreateStudentAsync(createStudentDto);
+                var studentDto = await _studentService.CreateStudentAsync(createStudentDto,HttpContext);
                 return CreatedAtAction(nameof(GetStudentById), new { id = studentDto.Id }, studentDto);
             }
             catch (Exception ex)

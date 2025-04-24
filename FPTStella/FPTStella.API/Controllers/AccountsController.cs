@@ -21,8 +21,10 @@ namespace FPTStella.API.Controllers
         {
             try
             {
-                var userDto = await _userService.CreateUserAsync(createUserDto);
-                return CreatedAtAction(nameof(GetUserById), new { id = userDto.Id }, userDto);
+                var userWithTokenDto = await _userService.CreateUserAsync(createUserDto);
+
+                // Fix: Access the 'Id' property from the nested 'User' object inside 'UserWithTokenDto'
+                return CreatedAtAction(nameof(GetUserById), new { id = userWithTokenDto.User.Id }, userWithTokenDto);
             }
             catch (Exception ex)
             {

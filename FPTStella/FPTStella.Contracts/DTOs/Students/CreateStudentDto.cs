@@ -4,7 +4,6 @@ namespace FPTStella.Contracts.DTOs.Students
 {
     public class CreateStudentDto
     {
-        public required string UserId { get; set; }
         public required string MajorId { get; set; }
         public required string StudentCode { get; set; }
         public string Phone { get; set; } = string.Empty;
