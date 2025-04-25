@@ -57,6 +57,7 @@ builder.Services.AddSingleton<IPOService, POService>();
 builder.Services.AddSingleton<IPO_PLO_MappingService, PO_PLO_MappingService>();
 builder.Services.AddSingleton<IPLOService, PLOService>();
 builder.Services.AddSingleton<ISubjectInCurriculumService, SubjectInCurriculumService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
