@@ -14,7 +14,7 @@ namespace FPTStella.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : BaseController
+    public class AuthController : ControllerBase
     {
         private readonly GoogleLoginUseCase _googleLoginUseCase;
         private readonly IAccountService _accountService;
@@ -42,7 +42,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return HandleException(ex);
+                return BadRequest(new { error = ex.Message });
             }
         }
 
@@ -71,9 +71,15 @@ namespace FPTStella.API.Controllers
                     new KeyValuePair<string, string>("code", decodedCode),
                     new KeyValuePair<string, string>("client_id", _configuration["Google:ClientId"]),
                     new KeyValuePair<string, string>("client_secret", _configuration["Google:ClientSecret"]),
-                    new KeyValuePair<string, string>("redirect_uri", _configuration["Google:RedirectUri"]),
+                    new KeyValuePair<string, string>("redirect_uri", "http://localhost:5173/oauth/google/callback"),
                     new KeyValuePair<string, string>("grant_type", "authorization_code")
                 };
+                Console.WriteLine("======== GOOGLE OAUTH REQUEST ========");
+                Console.WriteLine($"Code: {decodedCode}");
+                Console.WriteLine($"Client ID: {_configuration["Google:ClientId"]}");
+                Console.WriteLine($"Client Secret: {_configuration["Google:ClientSecret"]}");
+                Console.WriteLine($"Redirect URI: {_configuration["Google:RedirectUri"]}");
+                Console.WriteLine("=======================================");
 
                 var formContent = new FormUrlEncodedContent(formData);
 
@@ -111,7 +117,9 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return HandleException(ex);
+                Console.WriteLine($"Exception: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return BadRequest(new { error = ex.Message });
             }
         }
 
@@ -126,7 +134,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return HandleException(ex);
+                return BadRequest(new { error = ex.Message });
             }
         }
 
