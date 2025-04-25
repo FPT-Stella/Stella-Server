@@ -156,5 +156,41 @@ namespace FPTStella.Application.Services
             await accountRepository.DeleteAsync(id);
             await _unitOfWork.SaveAsync();
         }
+        public async Task<UserWithTokenDto> AdminLoginAsync(string email, string password)
+        {
+            var accountRepository = _unitOfWork.Repository<Account>();
+
+            var user = await accountRepository.FindOneAsync(u => u.Email == email);
+
+            if (user == null)
+            {
+                throw new Exception("Invalid email or password.");
+            }
+
+            if (user.Role != Role.Admin)
+            {
+                throw new Exception("Access denied. Only Admins can log in.");
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            {
+                throw new Exception("Invalid email or password.");
+            }
+
+            var token = _jwtService.GenerateJwtToken(user);
+
+            return new UserWithTokenDto
+            {
+                User = new UserDto
+                {
+                    Id = user.Id.ToString(),
+                    Username = user.Username,
+                    Role = user.Role.ToString(),
+                    FullName = user.FullName,
+                    Email = user.Email
+                },
+                Token = token
+            };
+        }
     }
 }
