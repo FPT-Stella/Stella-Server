@@ -1,6 +1,7 @@
 ﻿using FPTStella.Application.Common.Interfaces.Google;
 using FPTStella.Application.Common.Interfaces.Jwt;
 using FPTStella.Application.Common.Interfaces.Services;
+using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Contracts.DTOs.Google;
 using FPTStella.Domain.Entities;
 using FPTStella.Domain.Enums;
@@ -17,26 +18,31 @@ namespace FPTStella.Application.UseCases.Auth
     {
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IAccountService _userService;
+        private readonly IStudentService _studentService;
         private readonly IJwtService _jwtService;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
 
         public GoogleLoginUseCase(
             IGoogleAuthService googleAuthService,
             IAccountService userService,
             IJwtService jwtService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IStudentService studentService, IUnitOfWork unitOfWork)
         {
             _googleAuthService = googleAuthService;
             _userService = userService;
             _jwtService = jwtService;
             _configuration = configuration;
+            _studentService = studentService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<GoogleLoginResponse> ExecuteAsync(GoogleLoginRequest request)
         {
             // Xác thực Google id_token
             var tokenInfo = await _googleAuthService.ValidateGoogleTokenAsync(request.IdToken);
-
+            var studentRepo = _unitOfWork.Repository<Student>();
             // Kiểm tra aud
             var expectedAudience = _configuration["Google:ClientId"];
             if (tokenInfo.Aud != expectedAudience)
@@ -53,6 +59,20 @@ namespace FPTStella.Application.UseCases.Auth
                 Email = userDto.Email,
                 Role = Enum.TryParse<Role>(userDto.Role, out var parsedRole) ? parsedRole : throw new Exception("Invalid role") // Fix: Convert string to Role enum
             };
+            var existingStudent = await _studentService.GetStudentByUserIdAsync(acc.Id.ToString());
+            if (existingStudent == null)
+            {
+                var student = new Student
+            {
+                UserId = acc.Id,
+                MajorId = Guid.Empty, 
+                StudentCode = "",
+                Phone = "", 
+                Address = "" 
+            };
+                await studentRepo.InsertAsync(student);
+                await _unitOfWork.SaveAsync(); 
+            }
 
             // Sinh token
             var accessToken = _jwtService.GenerateJwtToken(acc);
