@@ -8,26 +8,44 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text;
+using FPTStella.Contracts.DTOs.Accounts;
 
 namespace FPTStella.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseController
     {
         private readonly GoogleLoginUseCase _googleLoginUseCase;
+        private readonly IAccountService _accountService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
 
         public AuthController(
             GoogleLoginUseCase googleLoginUseCase,
             IHttpClientFactory httpClientFactory,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IAccountService accountService)
         {
             _googleLoginUseCase = googleLoginUseCase ?? throw new ArgumentNullException(nameof(googleLoginUseCase));
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _accountService = accountService;
         }
+        [HttpPost("admin-login")]
+        public async Task<IActionResult> AdminLogin([FromBody] AdminLoginRequest request)
+        {
+            try
+            {
+                var userWithTokenDto = await _accountService.AdminLoginAsync(request.Email, request.Password);
+                return Ok(userWithTokenDto);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
         [HttpPost("oauth/google")]
         public async Task<IActionResult> GoogleOAuth([FromBody] GoogleGetCodeDto codeDto)
         {
@@ -49,14 +67,13 @@ namespace FPTStella.API.Controllers
                 Console.WriteLine($"Decoded code: {decodedCode}");
 
                 var formData = new[]
-{
-    new KeyValuePair<string, string>("code", decodedCode),
-    new KeyValuePair<string, string>("client_id", _configuration["Google:ClientId"]),
-    new KeyValuePair<string, string>("client_secret", _configuration["Google:ClientSecret"]),
-    new KeyValuePair<string, string>("redirect_uri", _configuration["Google:RedirectUri"]),
-    new KeyValuePair<string, string>("grant_type", "authorization_code")
-};
-
+                {
+                    new KeyValuePair<string, string>("code", decodedCode),
+                    new KeyValuePair<string, string>("client_id", _configuration["Google:ClientId"]),
+                    new KeyValuePair<string, string>("client_secret", _configuration["Google:ClientSecret"]),
+                    new KeyValuePair<string, string>("redirect_uri", _configuration["Google:RedirectUri"]),
+                    new KeyValuePair<string, string>("grant_type", "authorization_code")
+                };
 
                 var formContent = new FormUrlEncodedContent(formData);
 
@@ -94,9 +111,7 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                return BadRequest(new { error = ex.Message });
+                return HandleException(ex);
             }
         }
 
@@ -111,19 +126,21 @@ namespace FPTStella.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return HandleException(ex);
             }
         }
+
         public class RefreshTokenRequest
         {
             public string RefreshToken { get; set; }
         }
+
         private class GoogleTokensResponse
         {
             public string access_token { get; set; } = string.Empty;
             public string id_token { get; set; } = string.Empty;
             public string refresh_token { get; set; } = string.Empty;
-            public int expires_in { get; set; } 
+            public int expires_in { get; set; }
             public string token_type { get; set; } = string.Empty;
         }
     }
