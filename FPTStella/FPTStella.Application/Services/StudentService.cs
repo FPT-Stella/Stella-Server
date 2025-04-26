@@ -119,11 +119,6 @@ namespace FPTStella.Application.Services
             var studentRepository = _unitOfWork.Repository<Student>();
             var student = await studentRepository.FindOneAsync(s => s.UserId == guidUserId);
 
-            if (student == null)
-            {
-                throw new KeyNotFoundException("Student not found for this UserId.");
-            }
-
             return MapToStudentDto(student);
         }
 
