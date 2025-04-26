@@ -95,7 +95,24 @@ namespace FPTStella.Application.Services
 
             return MapToStudentDto(student);
         }
+        public async Task<StudentDto> GetCurrentStudentAsync(HttpContext httpContext)
+        {
+            var accountId = UserUtil.GetAccountId(httpContext);
+            if (accountId == null)
+            {
+                throw new UnauthorizedAccessException("User not authenticated.");
+            }
 
+            var studentRepository = _unitOfWork.Repository<Student>();
+            var student = await studentRepository.FindOneAsync(s => s.UserId == accountId);
+
+            if (student == null)
+            {
+                throw new KeyNotFoundException("Student profile not found for current user.");
+            }
+
+            return MapToStudentDto(student);
+        }
         public async Task<StudentDto> GetStudentByStudentCodeAsync(string studentCode)
         {
             var studentRepository = _unitOfWork.Repository<Student>();
@@ -153,7 +170,6 @@ namespace FPTStella.Application.Services
             await studentRepository.ReplaceAsync(id, student);
             await _unitOfWork.SaveAsync();
         }
-
         public async Task DeleteStudentAsync(string id)
         {
             var studentRepository = _unitOfWork.Repository<Student>();
