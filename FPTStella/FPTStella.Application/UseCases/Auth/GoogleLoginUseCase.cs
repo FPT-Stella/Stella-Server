@@ -61,7 +61,7 @@ namespace FPTStella.Application.UseCases.Auth
                 Email = userDto.Email,
                 Role = Enum.TryParse<Role>(userDto.Role, out var parsedRole) ? parsedRole : throw new Exception("Invalid role") // Fix: Convert string to Role enum
             };
-            var existingStudent = await studentRepo.GetByIdAsync(acc.Id.ToString());
+            var existingStudent = await _studentService.GetStudentByUserIdAsync(acc.Id.ToString());
             if (existingStudent == null)
             {
                 var student = new Student
