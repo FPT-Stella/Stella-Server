@@ -11,6 +11,7 @@ namespace FPTStella.Application.Common.Interfaces.Services
     public interface IStudentService
     {
         Task<StudentDto> CreateStudentAsync(CreateStudentDto createStudentDto, HttpContext httpContext);
+        Task<StudentDto> GetCurrentStudentAsync(HttpContext httpContext);
         Task<StudentDto> GetStudentByIdAsync(string id);
         Task<StudentDto> GetStudentByStudentCodeAsync(string studentCode);
         Task<StudentDto> GetStudentByUserIdAsync(string userId);

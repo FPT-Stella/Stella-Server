@@ -28,6 +28,23 @@ namespace FPTStella.API.Controllers
                 return HandleException(ex);
             }
         }
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMe()
+        {
+            try
+            {
+                var studentDto = await _studentService.GetCurrentStudentAsync(HttpContext);
+                return Ok(studentDto);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> CreateStudent([FromBody] CreateStudentDto createStudentDto)
         {
