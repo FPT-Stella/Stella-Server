@@ -56,24 +56,25 @@ namespace FPTStella.Application.UseCases.Auth
             var userDto = await _userService.FindOrCreateGoogleUserAsync(tokenInfo.Email, tokenInfo.Name);
             var acc = new Account
             {
-                Id = Guid.Parse(userDto.Id), // Fix: Convert string to Guid using Guid.Parse
+                Id = Guid.Parse(userDto.Id),
                 Username = userDto.Username,
                 Email = userDto.Email,
-                Role = Enum.TryParse<Role>(userDto.Role, out var parsedRole) ? parsedRole : throw new Exception("Invalid role") // Fix: Convert string to Role enum
+                Role = Enum.TryParse<Role>(userDto.Role, out var parsedRole) ? parsedRole : throw new Exception("Invalid role")
             };
-            var existingStudent = await studentRepo.GetByIdAsync(acc.Id.ToString());
+            var existingStudent = await studentRepo.FindOneAsync(s => s.UserId == acc.Id);
+
             if (existingStudent == null)
             {
                 var student = new Student
-            {
-                UserId = acc.Id,
-                MajorId = Guid.Empty, 
-                StudentCode = "",
-                Phone = "", 
-                Address = "" 
-            };
+                {
+                    UserId = acc.Id,
+                    MajorId = Guid.Empty,
+                    StudentCode = "",
+                    Phone = "",
+                    Address = ""
+                };
                 await studentRepo.InsertAsync(student);
-                await _unitOfWork.SaveAsync(); 
+                await _unitOfWork.SaveAsync();
                 var body = $@"<html lang=""en"">
 <head>
     <meta charset=""UTF-8"">
