@@ -43,6 +43,7 @@ builder.Services.AddSingleton<IPO_PLO_MappingRepository, PO_PLO_MappingRepositor
 builder.Services.AddSingleton<IPLORepository, PLORepository>();
 builder.Services.AddSingleton<IPORepository, PORepository>();
 builder.Services.AddSingleton<ISubjectInCurriculumRepository, SubjectInCurriculumRepository>();
+builder.Services.AddSingleton<ISubjectComboRepository, SubjectComboRepository>();
 
 
 // Đăng ký DI cho Application
@@ -58,6 +59,7 @@ builder.Services.AddSingleton<IPO_PLO_MappingService, PO_PLO_MappingService>();
 builder.Services.AddSingleton<IPLOService, PLOService>();
 builder.Services.AddSingleton<ISubjectInCurriculumService, SubjectInCurriculumService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<ISubjectComboService, SubjectComboService>();
 
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
