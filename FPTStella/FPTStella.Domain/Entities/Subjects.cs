@@ -22,12 +22,12 @@ namespace FPTStella.Domain.Entities
         public string SubjectDescription { get; set; }
         [BsonElement("credits")]
         public int Credits { get; set; }
-        [BsonElement("Prerequisite")]
+        [BsonElement("prerequisite")]
         public int Prerequisite { get; set; }
         [BsonRepresentation(BsonType.String)]
-        [BsonElement("PrerequisiteName")]
+        [BsonElement("prerequisite_Name")]
         public string PrerequisiteName { get; set; }
-        [BsonElement("degreeLevel")]
+        [BsonElement("degree_level")]
         [BsonRepresentation(BsonType.String)]
         public string DegreeLevel { get; set; }
         [BsonRepresentation(BsonType.String)]
@@ -36,7 +36,7 @@ namespace FPTStella.Domain.Entities
         [BsonElement("sysllabus_description")]
         [BsonRepresentation(BsonType.String)]
         public string SysllabusDescription { get; set; }
-        [BsonElement("StudentTask")]
+        [BsonElement("studentTask")]
         [BsonRepresentation(BsonType.String)]
         public string StudentTask { get; set; }
         [BsonElement("scoring_scale")]
