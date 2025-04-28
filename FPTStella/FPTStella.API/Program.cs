@@ -44,6 +44,7 @@ builder.Services.AddSingleton<IPLORepository, PLORepository>();
 builder.Services.AddSingleton<IPORepository, PORepository>();
 builder.Services.AddSingleton<ISubjectInCurriculumRepository, SubjectInCurriculumRepository>();
 builder.Services.AddSingleton<ISubjectComboRepository, SubjectComboRepository>();
+builder.Services.AddSingleton<ISubjectComboSubjectRepository, SubjectComboSubjectRepository>();
 
 
 // Đăng ký DI cho Application
@@ -60,6 +61,7 @@ builder.Services.AddSingleton<IPLOService, PLOService>();
 builder.Services.AddSingleton<ISubjectInCurriculumService, SubjectInCurriculumService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<ISubjectComboService, SubjectComboService>();
+builder.Services.AddSingleton<ISubjectComboSubjectService, SubjectComboSubjectService>();
 
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
