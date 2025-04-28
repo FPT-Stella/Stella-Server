@@ -51,6 +51,103 @@ namespace FPTStella.Application.Services
             await _mappingRepository.InsertAsync(mapping);
             await _unitOfWork.SaveAsync();
         }
+        /// <summary>
+        /// Creates multiple mappings between POs and PLOs in a single operation and returns the created mappings.
+        /// </summary>
+        /// <param name="createMappingBatchDto">The DTO containing multiple mapping creation data</param>
+        /// <returns>The DTO with successfully created mappings</returns>
+        public async Task<CreatePO_PLO_MappingBatchDto> CreateMappingBatchAsync(CreatePO_PLO_MappingBatchDto createMappingBatchDto)
+        {
+            if (createMappingBatchDto.Mappings == null || !createMappingBatchDto.Mappings.Any())
+            {
+                throw new ArgumentException("No mappings provided for batch creation.");
+            }
+
+            var mappingsToInsert = new List<PO_PLO_Mapping>();
+            var createdMappings = new List<CreatePO_PLO_MappingDto>();
+            var invalidMappings = new List<(CreatePO_PLO_MappingDto Mapping, string Reason)>();
+            var now = DateTime.UtcNow;
+
+            var poRepository = _unitOfWork.Repository<POs>();
+            var ploRepository = _unitOfWork.Repository<PLOs>();
+
+            // Get all distinct PO IDs and PLO IDs to validate in batches
+            var distinctPoIds = createMappingBatchDto.Mappings.Select(m => m.PoId).Distinct().ToList();
+            var distinctPloIds = createMappingBatchDto.Mappings.Select(m => m.PloId).Distinct().ToList();
+
+            // Retrieve existing POs and PLOs to validate against
+            var existingPOs = new List<POs>();
+            var existingPLOs = new List<PLOs>();
+
+            foreach (var poId in distinctPoIds)
+            {
+                var po = await poRepository.GetByIdAsync(poId.ToString());
+                if (po != null)
+                {
+                    existingPOs.Add(po);
+                }
+            }
+
+            foreach (var ploId in distinctPloIds)
+            {
+                var plo = await ploRepository.GetByIdAsync(ploId.ToString());
+                if (plo != null)
+                {
+                    existingPLOs.Add(plo);
+                }
+            }
+
+            foreach (var mappingDto in createMappingBatchDto.Mappings)
+            {
+                // Skip if mapping already exists
+                if (await _mappingRepository.IsMappingExistedAsync(mappingDto.PoId, mappingDto.PloId))
+                {
+                    continue;
+                }
+                // Validate PO and PLO existence
+                var poExists = existingPOs.Any(p => p.Id == mappingDto.PoId);
+                var ploExists = existingPLOs.Any(p => p.Id == mappingDto.PloId);
+
+                if (!poExists)
+                {
+                    invalidMappings.Add((mappingDto, $"PO with ID {mappingDto.PoId} does not exist"));
+                    continue;
+                }
+
+                if (!ploExists)
+                {
+                    invalidMappings.Add((mappingDto, $"PLO with ID {mappingDto.PloId} does not exist"));
+                    continue;
+                }
+                var mapping = new PO_PLO_Mapping
+                {
+                    PoId = mappingDto.PoId,
+                    PloId = mappingDto.PloId,
+                    InsDate = now,
+                    UpdDate = now,
+                    DelFlg = false
+                };
+
+                mappingsToInsert.Add(mapping);
+                createdMappings.Add(new CreatePO_PLO_MappingDto
+                {
+                    PoId = mappingDto.PoId,
+                    PloId = mappingDto.PloId
+                });
+            }
+
+            if (mappingsToInsert.Any())
+            {
+                await _mappingRepository.InsertManyAsync(mappingsToInsert);
+                await _unitOfWork.SaveAsync();
+            }
+
+            // Return only the mappings that were successfully created
+            return new CreatePO_PLO_MappingBatchDto
+            {
+                Mappings = createdMappings
+            };
+        }
 
         /// <summary>
         /// Gets PLO IDs associated with a specific PO.
@@ -101,6 +198,33 @@ namespace FPTStella.Application.Services
         {
             await _mappingRepository.DeleteMappingsByPloIdAsync(ploId);
             await _unitOfWork.SaveAsync();
+        }
+        public async Task<List<POWithNameDto>> GetPOsWithNameByPloIdAsync(Guid ploId)
+        {
+            var poDetailsWithName = await _mappingRepository.GetPOsWithNameByPloIdAsync(ploId);
+
+            return poDetailsWithName.Select(p => new POWithNameDto
+            {
+                Id = p.Id,
+                Name = p.Name
+            }).ToList();
+        }
+        private async Task ValidateIdsExistAsync(Guid poId, Guid ploId)
+        {
+            var poRepository = _unitOfWork.Repository<POs>();
+            var ploRepository = _unitOfWork.Repository<PLOs>();
+
+            var po = await poRepository.GetByIdAsync(poId.ToString());
+            if (po == null)
+            {
+                throw new KeyNotFoundException($"Program Outcome (PO) with ID {poId} does not exist.");
+            }
+
+            var plo = await ploRepository.GetByIdAsync(ploId.ToString());
+            if (plo == null)
+            {
+                throw new KeyNotFoundException($"Program Learning Outcome (PLO) with ID {ploId} does not exist.");
+            }
         }
     }
 }

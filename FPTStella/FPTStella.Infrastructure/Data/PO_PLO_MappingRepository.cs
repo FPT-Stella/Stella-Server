@@ -67,5 +67,30 @@ namespace FPTStella.Infrastructure.Data
             var projection = Builders<PO_PLO_Mapping>.Projection.Expression(m => m.PoId);
             return await _collection.Find(filter).Project(projection).ToListAsync();
         }
+        public async Task<List<(Guid Id, string Name)>> GetPOsWithNameByPloIdAsync(Guid ploId)
+        {
+            // Step 1: Get PO IDs from mappings
+            var filter = Builders<PO_PLO_Mapping>.Filter.Eq(m => m.PloId, ploId) &
+                         Builders<PO_PLO_Mapping>.Filter.Eq(m => m.DelFlg, false);
+            var mappings = await _collection.Find(filter).ToListAsync();
+
+            if (!mappings.Any())
+            {
+                return new List<(Guid, string)>();
+            }
+
+            var poIds = mappings.Select(m => m.PoId).ToList();
+
+            // Step 2: Get PO details from POs collection
+            // Access the MongoDB database through the _collection's Database property
+            var poCollection = _collection.Database.GetCollection<POs>("POs");
+            var poFilter = Builders<POs>.Filter.In(p => p.Id, poIds) &
+                          Builders<POs>.Filter.Eq(p => p.DelFlg, false);
+
+            var pos = await poCollection.Find(poFilter).ToListAsync();
+
+            // Step 3: Map to result format
+            return pos.Select(p => (p.Id, p.PoName)).ToList();
+        }
     }
 }
