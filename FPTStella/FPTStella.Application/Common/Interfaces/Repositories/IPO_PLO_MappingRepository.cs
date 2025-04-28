@@ -46,5 +46,7 @@ namespace FPTStella.Application.Common.Interfaces.Repositories
         /// <param name="ploId">Id của PO.</param>
         /// </summary>
         Task<List<Guid>> GetPoIdsByPloIdAsync(Guid ploId);
+        Task<List<(Guid Id, string Name)>> GetPOsWithNameByPloIdAsync(Guid ploId);
+
     }
 }

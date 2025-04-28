@@ -16,6 +16,42 @@ namespace FPTStella.API.Controllers
             _poPloMappingService = poPloMappingService;
         }
 
+        [HttpGet("po/{ploId}")]
+        public async Task<IActionResult> GetPoIdsByPoId(Guid ploId)
+        {
+            try
+            {
+                var poIds = await _poPloMappingService.GetPOsWithNameByPloIdAsync(ploId);
+                return Ok(poIds);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+        // Add this new endpoint to support batch creation
+        [HttpPost("batch")]
+        public async Task<IActionResult> CreateMappingBatch([FromBody] CreatePO_PLO_MappingBatchDto createMappingBatchDto)
+        {
+            try
+            {
+                var createdMappings = await _poPloMappingService.CreateMappingBatchAsync(createMappingBatchDto);
+                return Ok(createdMappings);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateMapping([FromBody] CreatePO_PLO_MappingDto createMappingDto)
         {
@@ -30,7 +66,7 @@ namespace FPTStella.API.Controllers
             }
         }
 
-        [HttpGet("po/{poId}")]
+        [HttpGet("plo/{poId}")]
         public async Task<IActionResult> GetPloIdsByPoId(Guid poId)
         {
             try
@@ -44,19 +80,19 @@ namespace FPTStella.API.Controllers
             }
         }
 
-        [HttpGet("plo/{ploId}")]
-        public async Task<IActionResult> GetPoIdsByPloId(Guid ploId)
-        {
-            try
-            {
-                var poIds = await _poPloMappingService.GetPoIdsByPloIdAsync(ploId);
-                return Ok(poIds);
-            }
-            catch (Exception ex)
-            {
-                return HandleException(ex);
-            }
-        }
+        //[HttpGet("po/{ploId}")]
+        //public async Task<IActionResult> GetPoIdsByPloId(Guid ploId)
+        //{
+        //    try
+        //    {
+        //        var poIds = await _poPloMappingService.GetPoIdsByPloIdAsync(ploId);
+        //        return Ok(poIds);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return HandleException(ex);
+        //    }
+        //}
 
         [HttpDelete("po/{poId}")]
         public async Task<IActionResult> DeleteMappingsByPoId(Guid poId)

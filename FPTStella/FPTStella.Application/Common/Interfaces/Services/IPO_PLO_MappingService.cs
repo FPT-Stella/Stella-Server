@@ -15,5 +15,8 @@ namespace FPTStella.Application.Common.Interfaces.Services
         Task<bool> IsMappingExistedAsync(Guid poId, Guid ploId);
         Task DeleteMappingsByPoIdAsync(Guid poId);
         Task DeleteMappingsByPloIdAsync(Guid ploId);
+        Task<List<POWithNameDto>> GetPOsWithNameByPloIdAsync(Guid ploId);
+        Task<CreatePO_PLO_MappingBatchDto> CreateMappingBatchAsync(CreatePO_PLO_MappingBatchDto createMappingBatchDto);
+
     }
 }
