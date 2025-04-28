@@ -157,7 +157,16 @@ namespace FPTStella.Application.Services
                     throw new InvalidOperationException("StudentCode already exists.");
                 }
             }
-
+            if(student.MajorId != updateStudentDto.MajorId)
+            {
+                var majorRepository = _unitOfWork.Repository<Majors>();
+                var major = await majorRepository.GetByIdAsync(updateStudentDto.MajorId.ToString());
+                if (major == null)
+                {
+                    throw new KeyNotFoundException("Major not found.");
+                }
+            }
+            student.MajorId = updateStudentDto.MajorId;
             student.StudentCode = updateStudentDto.StudentCode;
             student.Phone = updateStudentDto.Phone;
             student.Address = updateStudentDto.Address;

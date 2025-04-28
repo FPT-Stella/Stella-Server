@@ -8,6 +8,7 @@ namespace FPTStella.Contracts.DTOs.Subjects
 {
     public class SubjectDto
     {
+        public string Id { get; set; } = string.Empty;
         public required string SubjectName { get; set; }
         public required string SubjectCode { get; set; }
         public string SubjectDescription { get; set; } = string.Empty;

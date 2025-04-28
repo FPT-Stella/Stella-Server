@@ -25,6 +25,7 @@ namespace FPTStella.Application.Services
         {
             return new SubjectDto
             {
+                Id = subject.Id.ToString(),
                 SubjectCode = subject.SubjectCode,
                 SubjectName = subject.SubjectName,
                 SubjectDescription = subject.SubjectDescription,
