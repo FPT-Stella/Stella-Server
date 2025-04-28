@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FPTStella.Infrastructure.Data
+namespace FPTStella.Domain.Entities
 {
     public class SubjectComboSubjects : BaseEntity
     {
