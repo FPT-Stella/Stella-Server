@@ -7,6 +7,6 @@ namespace FPTStella.Contracts.DTOs.Students
         public string StudentCode { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
-        public Guid MajorId { get; set; } ;
+        public Guid MajorId { get; set; } 
     }
 }
