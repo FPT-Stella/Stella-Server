@@ -45,6 +45,14 @@ namespace FPTStella.API.Controllers
             return Ok(result);
         }
 
+        // New endpoint to get subjects by term number
+        [HttpGet("termNo/{termNo}")]
+        public async Task<ActionResult<List<Subjects>>> GetByTermNo(int termNo)
+        {
+            var result = await _subjectService.GetSubjectsByTermNoAsync(termNo);
+            return Ok(result);
+        }
+
         [HttpGet("subjectCode/{code}")]
         public async Task<ActionResult<Subjects?>> GetBySubjectCode(string code)
         {
@@ -64,8 +72,8 @@ namespace FPTStella.API.Controllers
         {
             try
             {
-                await _subjectService.CreateSubjectAsync(dto);
-                return CreatedAtAction(nameof(GetBySubjectCode), new { code = dto.SubjectCode }, dto);
+                var createdSubject = await _subjectService.CreateSubjectAsync(dto);
+                return CreatedAtAction(nameof(GetBySubjectCode), new { code = dto.SubjectCode }, createdSubject);
             }
             catch (InvalidOperationException ex)
             {
@@ -100,6 +108,7 @@ namespace FPTStella.API.Controllers
                 return NotFound(ex.Message);
             }
         }
+
         // GET: api/subjects/code-name?code=SUB123&name=Math
         [HttpGet("code-name")]
         public async Task<IActionResult> GetBySubjectCodeAndSubjectName([FromQuery] string code, [FromQuery] string name)
@@ -123,6 +132,5 @@ namespace FPTStella.API.Controllers
             var result = await _subjectService.GetByMajorIdAndSubjectNameAsync(majorId, name);
             return result == null ? NotFound("Subject not found.") : Ok(result);
         }
-
     }
 }

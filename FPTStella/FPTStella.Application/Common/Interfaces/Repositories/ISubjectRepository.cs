@@ -11,8 +11,9 @@ namespace FPTStella.Application.Common.Interfaces.Repositories
     public interface ISubjectRepository : IRepository<Subjects>
     {
         Task<List<Subjects>> GetAllSubjectsAsync();
-        Task<Subjects> GetSubjectByIdAsync(Guid id);
+        Task<Subjects?> GetSubjectByIdAsync(Guid id);
         Task<List<Subjects>> GetSubjectsByDegreeLevelAsync(string degreeLevel);
+        Task<List<Subjects>> GetSubjectsByTermNoAsync(int termNo);
         Task CreateSubjectAsync(Subjects subject);
         Task<Subjects?> GetBySubjectCodeAsync(string subjectCode);
         Task<Subjects?> GetBySubjectNameAsync(string subjectName);

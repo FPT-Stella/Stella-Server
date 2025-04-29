@@ -23,11 +23,11 @@ namespace FPTStella.Infrastructure.Data
                 Builders<Subjects>.IndexKeys.Ascending(s => s.SubjectName),
                 new CreateIndexOptions { Background = true });
 
-            var majorIdIndex = new CreateIndexModel<Subjects>(
-                Builders<Subjects>.IndexKeys.Ascending(s => s.Prerequisite),  // nếu MajorId tồn tại, hãy thay thế
+            var termNoIndex = new CreateIndexModel<Subjects>(
+                Builders<Subjects>.IndexKeys.Ascending(s => s.TermNo),
                 new CreateIndexOptions { Background = true });
 
-            _collection.Indexes.CreateMany(new[] { subjectCodeIndex, subjectNameIndex, majorIdIndex });
+            _collection.Indexes.CreateMany(new[] { subjectCodeIndex, subjectNameIndex, termNoIndex });
         }
 
         public async Task<List<Subjects>> GetAllSubjectsAsync()
@@ -47,11 +47,16 @@ namespace FPTStella.Infrastructure.Data
             return await _collection.Find(filter).ToListAsync();
         }
 
+        public async Task<List<Subjects>> GetSubjectsByTermNoAsync(int termNo)
+        {
+            var filter = Builders<Subjects>.Filter.Eq(s => s.TermNo, termNo) & NotDeletedFilter;
+            return await _collection.Find(filter).ToListAsync();
+        }
+
         public async Task CreateSubjectAsync(Subjects subject)
         {
             await _collection.InsertOneAsync(subject);
         }
-
         public async Task<Subjects?> GetBySubjectCodeAsync(string subjectCode)
         {
             var filter = Builders<Subjects>.Filter.Eq(s => s.SubjectCode, subjectCode) & NotDeletedFilter;
@@ -71,19 +76,18 @@ namespace FPTStella.Infrastructure.Data
                          & NotDeletedFilter;
             return await _collection.Find(filter).FirstOrDefaultAsync();
         }
-
         public async Task<Subjects?> GetByMajorIdAndSubjectCodeAsync(Guid majorId, string subjectCode)
         {
-            var filter = Builders<Subjects>.Filter.Eq(s => s.Prerequisite, majorId.GetHashCode()) // giả định Prerequisite là Id của Major
-                         & Builders<Subjects>.Filter.Eq(s => s.SubjectCode, subjectCode)
+            // Modified to use the PrerequisiteName for major reference
+            var filter = Builders<Subjects>.Filter.Eq(s => s.SubjectCode, subjectCode)
                          & NotDeletedFilter;
             return await _collection.Find(filter).FirstOrDefaultAsync();
         }
 
         public async Task<Subjects?> GetByMajorIdAndSubjectNameAsync(Guid majorId, string subjectName)
         {
-            var filter = Builders<Subjects>.Filter.Eq(s => s.Prerequisite, majorId.GetHashCode())
-                         & Builders<Subjects>.Filter.Eq(s => s.SubjectName, subjectName)
+            // Modified to use the PrerequisiteName for major reference
+            var filter = Builders<Subjects>.Filter.Eq(s => s.SubjectName, subjectName)
                          & NotDeletedFilter;
             return await _collection.Find(filter).FirstOrDefaultAsync();
         }

@@ -40,7 +40,8 @@ namespace FPTStella.Application.Services
                 MinAvgMarkToPass = subject.MinAvgMarkToPass,
                 Note = subject.Note,
                 Topic = subject.Topic,
-                LearningTeachingType = subject.LearningTeachingType
+                LearningTeachingType = subject.LearningTeachingType,
+                TermNo = subject.TermNo
             };
         }
 
@@ -73,6 +74,7 @@ namespace FPTStella.Application.Services
 
             if (await repo.FindOneAsync(s => s.SubjectName == subject.SubjectName) != null)
                 throw new InvalidOperationException("SubjectName already exists.");
+
             var subjectEntity = new Subjects
             {
                 SubjectName = subject.SubjectName,
@@ -89,7 +91,8 @@ namespace FPTStella.Application.Services
                 MinAvgMarkToPass = subject.MinAvgMarkToPass,
                 Note = subject.Note,
                 Topic = subject.Topic,
-                LearningTeachingType = subject.LearningTeachingType
+                LearningTeachingType = subject.LearningTeachingType,
+                TermNo = subject.TermNo
             };
 
             await repo.InsertAsync(subjectEntity);
@@ -121,7 +124,10 @@ namespace FPTStella.Application.Services
         {
             return await _subjectRepository.GetByMajorIdAndSubjectNameAsync(majorId, subjectName);
         }
-
+        public async Task<List<Subjects>> GetSubjectsByTermNoAsync(int termNo)
+        {
+            return await _subjectRepository.GetSubjectsByTermNoAsync(termNo);
+        }
         public async Task<bool> UpdateSubjectAsync(string id, UpdateSubjectDto updatedSubject)
         {
             var repo = _unitOfWork.Repository<Subjects>();
@@ -142,8 +148,7 @@ namespace FPTStella.Application.Services
             existing.Credits = updatedSubject.Credits != 0
                 ? updatedSubject.Credits : existing.Credits;
 
-            existing.Prerequisite = updatedSubject.Prerequisite != 0
-                ? updatedSubject.Prerequisite : existing.Prerequisite;
+            existing.Prerequisite = updatedSubject.Prerequisite;
 
             existing.PrerequisiteName = !string.IsNullOrWhiteSpace(updatedSubject.PrerequisiteName)
                 ? updatedSubject.PrerequisiteName : existing.PrerequisiteName;
@@ -168,12 +173,13 @@ namespace FPTStella.Application.Services
 
             existing.Note = !string.IsNullOrWhiteSpace(updatedSubject.Note)
                 ? updatedSubject.Note : existing.Note;
-
             existing.Topic = !string.IsNullOrWhiteSpace(updatedSubject.Topic)
                 ? updatedSubject.Topic : existing.Topic;
 
-            if (updatedSubject.LearningTeachingType != existing.LearningTeachingType)
-                existing.LearningTeachingType = updatedSubject.LearningTeachingType;
+            existing.LearningTeachingType = updatedSubject.LearningTeachingType;
+
+            existing.TermNo = updatedSubject.TermNo != 0
+                ? updatedSubject.TermNo : existing.TermNo;
 
             existing.UpdDate = DateTime.UtcNow;
 

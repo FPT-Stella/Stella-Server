@@ -13,17 +13,17 @@ namespace FPTStella.Domain.Entities
     {
         [BsonRepresentation(BsonType.String)]
         [BsonElement("subjectName")]
-        public string SubjectName { get; set; }
+        public string SubjectName { get; set; } =  string.Empty;
         [BsonRepresentation(BsonType.String)]
         [BsonElement("subjectCode")]
-        public string SubjectCode { get; set; }
+        public string SubjectCode { get; set; } = string.Empty ;
         [BsonRepresentation(BsonType.String)]
         [BsonElement("subjectDescription")]
-        public string SubjectDescription { get; set; }
+        public string SubjectDescription { get; set; } = string.Empty;
         [BsonElement("credits")]
         public int Credits { get; set; }
         [BsonElement("prerequisite")]
-        public int Prerequisite { get; set; }
+        public bool Prerequisite { get; set; }
         [BsonRepresentation(BsonType.String)]
         [BsonElement("prerequisite_Name")]
         public string PrerequisiteName { get; set; }
@@ -51,5 +51,7 @@ namespace FPTStella.Domain.Entities
         public string Topic { get; set; }
         [BsonElement("learning_teaching_type")]
         public bool LearningTeachingType { get; set; }
+        [BsonElement("term_no")]
+        public int TermNo { get; set; }
     }
 }

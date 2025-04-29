@@ -12,7 +12,7 @@ namespace FPTStella.Contracts.DTOs.Subjects
         public required string SubjectCode { get; set; }
         public required string SubjectDescription { get; set; } = string.Empty;
         public required int Credits { get; set; }
-        public required int Prerequisite { get; set; }
+        public required bool Prerequisite { get; set; }
         public required string PrerequisiteName { get; set; } = string.Empty;
         public required string DegreeLevel { get; set; } = string.Empty;
         public required string TimeAllocation { get; set; } = string.Empty;
@@ -23,5 +23,6 @@ namespace FPTStella.Contracts.DTOs.Subjects
         public required string Note { get; set; } = string.Empty;
         public required string Topic { get; set; } = string.Empty;
         public required bool LearningTeachingType { get; set; }
+        public required int TermNo { get; set; }
     }
 }

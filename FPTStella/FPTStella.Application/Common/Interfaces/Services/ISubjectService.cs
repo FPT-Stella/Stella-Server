@@ -13,6 +13,7 @@ namespace FPTStella.Application.Common.Interfaces.Services
         Task<List<Subjects>> GetAllSubjectsAsync();
         Task<Subjects> GetSubjectByIdAsync(string id);
         Task<List<Subjects>> GetSubjectsByDegreeLevelAsync(string degreeLevel);
+        Task<List<Subjects>> GetSubjectsByTermNoAsync(int termNo);
         Task<SubjectDto> CreateSubjectAsync(CreateSubjectDto subject);
         Task<Subjects?> GetBySubjectCodeAsync(string subjectCode);
         Task<Subjects?> GetBySubjectNameAsync(string subjectName);
