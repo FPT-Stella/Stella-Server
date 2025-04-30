@@ -18,7 +18,7 @@ Bạn có thể xem tài liệu API tại: [Swagger UI](https://stella.dacoban.s
 - [Đóng góp](#đóng-góp)
 - [Giấy phép](#giấy-phép)
 
-## 🏗️ **Cấu trúc thư mục**
+## 🏗️ **Contruct Folder**
 Code
 ```
 FPTStella/
