@@ -92,5 +92,72 @@ namespace FPTStella.Infrastructure.Data
             // Step 3: Map to result format
             return pos.Select(p => (p.Id, p.PoName)).ToList();
         }
+        /// <summary>
+        /// Updates a PO_PLO mapping entity in the database.
+        /// </summary>
+        /// <param name="mapping">The mapping entity to update</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public async Task UpdateAsync(PO_PLO_Mapping mapping)
+        {
+            if (mapping == null)
+            {
+                throw new ArgumentNullException(nameof(mapping));
+            }
+
+            mapping.UpdDate = DateTime.UtcNow;
+
+            // Create a filter to find the document by ID
+            var filter = Builders<PO_PLO_Mapping>.Filter.Eq(m => m.Id, mapping.Id);
+
+            // Replace the existing document with the updated one
+            await _collection.ReplaceOneAsync(filter, mapping);
+        }
+        /// <summary>
+        /// Gets a specific mapping between PO and PLO.
+        /// </summary>
+        /// <param name="poId">The PO ID</param>
+        /// <param name="ploId">The PLO ID</param>
+        /// <returns>The mapping if it exists, otherwise null</returns>
+        public async Task<PO_PLO_Mapping?> GetMappingAsync(Guid poId, Guid ploId)
+        {
+            var filter = Builders<PO_PLO_Mapping>.Filter.Eq(m => m.PoId, poId) &
+                         Builders<PO_PLO_Mapping>.Filter.Eq(m => m.PloId, ploId) &
+                         NotDeletedFilter;
+
+            return await _collection.Find(filter).FirstOrDefaultAsync();
+        }
+        /// <summary>
+        /// Updates multiple PO_PLO mappings in the database.
+        /// </summary>
+        /// <param name="mappings">The collection of mapping entities to update</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public async Task UpdateManyAsync(IEnumerable<PO_PLO_Mapping> mappings)
+        {
+            if (mappings == null)
+            {
+                throw new ArgumentNullException(nameof(mappings));
+            }
+
+            // Process each mapping individually using the existing UpdateAsync method
+            foreach (var mapping in mappings)
+            {
+                await UpdateAsync(mapping);
+            }
+        }
+        /// <summary>
+        /// Adds multiple PO_PLO mappings to the database in a single operation.
+        /// </summary>
+        /// <param name="mappings">The collection of mappings to add</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        public async Task AddManyAsync(IEnumerable<PO_PLO_Mapping> mappings)
+        {
+            if (mappings == null)
+            {
+                throw new ArgumentNullException(nameof(mappings));
+            }
+
+            // Use the existing InsertManyAsync method for bulk insertion
+            await InsertManyAsync(mappings);
+        }
     }
 }

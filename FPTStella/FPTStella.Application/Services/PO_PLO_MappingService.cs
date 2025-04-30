@@ -226,5 +226,138 @@ namespace FPTStella.Application.Services
                 throw new KeyNotFoundException($"Program Learning Outcome (PLO) with ID {ploId} does not exist.");
             }
         }
+        /// <summary>
+        /// Updates multiple mappings between POs and PLOs based on the provided data.
+        /// </summary>
+        /// <param name="updateMappingBatchDto">The DTO containing multiple mapping update data</param>
+        /// <returns>A task representing the asynchronous operation</returns>
+        /// <summary>
+        /// Updates multiple mappings between POs and PLOs based on the provided data.
+        /// </summary>
+        /// <param name="updateMappingBatchDto">The DTO containing multiple mapping update data</param>
+        /// <returns>A result containing information about updated and failed mappings</returns>
+        public async Task<UpdatePO_PLO_MappingResultDto> UpdateMappingsAsync(UpdatePO_PLO_MappingBatchDto updateMappingBatchDto)
+        {
+            if (updateMappingBatchDto.Mappings == null || !updateMappingBatchDto.Mappings.Any())
+            {
+                throw new ArgumentException("No mappings provided for update.");
+            }
+
+            var now = DateTime.UtcNow;
+            var mappingsToUpdate = new List<PO_PLO_Mapping>();
+            var updatedMappings = new List<UpdatePO_PLO_MappingDto>();
+            var failedMappings = new List<(UpdatePO_PLO_MappingDto Mapping, string Reason)>();
+
+            // Validate PO and PLO existence in batch
+            var allPoIds = updateMappingBatchDto.Mappings
+                .SelectMany(m => new[] { m.PoId, m.NewPoId })
+                .Where(id => id.HasValue && id.Value != Guid.Empty)
+                .Select(id => id!.Value)
+                .Distinct()
+                .ToList();
+
+            var allPloIds = updateMappingBatchDto.Mappings
+                .SelectMany(m => new[] { m.PloId, m.NewPloId })
+                .Where(id => id.HasValue && id.Value != Guid.Empty)
+                .Select(id => id!.Value)
+                .Distinct()
+                .ToList();
+
+            var poRepository = _unitOfWork.Repository<POs>();
+            var ploRepository = _unitOfWork.Repository<PLOs>();
+
+            var existingPOs = new Dictionary<Guid, bool>();
+            var existingPLOs = new Dictionary<Guid, bool>();
+
+            foreach (var poId in allPoIds)
+            {
+                var po = await poRepository.GetByIdAsync(poId.ToString());
+                existingPOs[poId] = po != null;
+            }
+
+            foreach (var ploId in allPloIds)
+            {
+                var plo = await ploRepository.GetByIdAsync(ploId.ToString());
+                existingPLOs[ploId] = plo != null;
+            }
+
+            foreach (var mappingDto in updateMappingBatchDto.Mappings)
+            {
+                try
+                {
+                    // Validate the existing mapping
+                    var existingMapping = await _mappingRepository.GetMappingAsync(mappingDto.PoId, mappingDto.PloId);
+                    if (existingMapping == null)
+                    {
+                        failedMappings.Add((mappingDto, $"Mapping between PO ID {mappingDto.PoId} and PLO ID {mappingDto.PloId} does not exist."));
+                        continue;
+                    }
+
+                    // Validate new PO ID if provided
+                    if (mappingDto.NewPoId.HasValue && mappingDto.NewPoId.Value != Guid.Empty)
+                    {
+                        if (!existingPOs.TryGetValue(mappingDto.NewPoId.Value, out var poExists) || !poExists)
+                        {
+                            failedMappings.Add((mappingDto, $"New PO with ID {mappingDto.NewPoId} does not exist."));
+                            continue;
+                        }
+                    }
+
+                    // Validate new PLO ID if provided
+                    if (mappingDto.NewPloId.HasValue && mappingDto.NewPloId.Value != Guid.Empty)
+                    {
+                        if (!existingPLOs.TryGetValue(mappingDto.NewPloId.Value, out var ploExists) || !ploExists)
+                        {
+                            failedMappings.Add((mappingDto, $"New PLO with ID {mappingDto.NewPloId} does not exist."));
+                            continue;
+                        }
+                    }
+
+                    // Check if the new mapping already exists
+                    if ((mappingDto.NewPoId.HasValue || mappingDto.NewPloId.HasValue) &&
+                        await _mappingRepository.IsMappingExistedAsync(
+                            mappingDto.NewPoId ?? mappingDto.PoId,
+                            mappingDto.NewPloId ?? mappingDto.PloId))
+                    {
+                        failedMappings.Add((mappingDto, $"A mapping between PO ID {mappingDto.NewPoId ?? mappingDto.PoId} and PLO ID {mappingDto.NewPloId ?? mappingDto.PloId} already exists."));
+                        continue;
+                    }
+
+                    // Create updated mapping
+                    var updatedMapping = new PO_PLO_Mapping
+                    {
+                        Id = existingMapping.Id,
+                        PoId = mappingDto.NewPoId ?? existingMapping.PoId,
+                        PloId = mappingDto.NewPloId ?? existingMapping.PloId,
+                        InsDate = existingMapping.InsDate,
+                        UpdDate = now,
+                        DelFlg = existingMapping.DelFlg
+                    };
+
+                    mappingsToUpdate.Add(updatedMapping);
+                    updatedMappings.Add(mappingDto);
+                }
+                catch (Exception ex)
+                {
+                    failedMappings.Add((mappingDto, $"Error updating mapping: {ex.Message}"));
+                }
+            }
+
+            if (mappingsToUpdate.Any())
+            {
+                await _mappingRepository.UpdateManyAsync(mappingsToUpdate);
+                await _unitOfWork.SaveAsync();
+            }
+
+            return new UpdatePO_PLO_MappingResultDto
+            {
+                UpdatedMappings = updatedMappings,
+                FailedMappings = failedMappings.Select(f => new FailedMappingDto
+                {
+                    Mapping = f.Mapping,
+                    Reason = f.Reason
+                }).ToList()
+            };
+        }
     }
 }

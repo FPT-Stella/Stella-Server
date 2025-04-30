@@ -121,5 +121,42 @@ namespace FPTStella.API.Controllers
                 return HandleException(ex);
             }
         }
+        [HttpPut("batch-update")]
+        public async Task<IActionResult> UpdateMappingsAsync([FromBody] UpdatePO_PLO_MappingBatchDto updateMappingBatchDto)
+        {
+            if (updateMappingBatchDto == null || updateMappingBatchDto.Mappings == null || !updateMappingBatchDto.Mappings.Any())
+            {
+                return BadRequest("No mappings provided for update.");
+            }
+
+            try
+            {
+                var result = await _poPloMappingService.UpdateMappingsAsync(updateMappingBatchDto);
+
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the error here if necessary
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        [HttpPatch("api/po-plo-mapping")]
+        public async Task<IActionResult> UpdatePoPloMapping([FromBody] PatchPloMappingDto dto)
+        {
+            try
+            {
+                await _poPloMappingService.UpdatePoPloMappingAsync(dto);
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

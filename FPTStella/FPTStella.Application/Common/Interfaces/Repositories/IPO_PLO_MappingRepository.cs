@@ -47,6 +47,9 @@ namespace FPTStella.Application.Common.Interfaces.Repositories
         /// </summary>
         Task<List<Guid>> GetPoIdsByPloIdAsync(Guid ploId);
         Task<List<(Guid Id, string Name)>> GetPOsWithNameByPloIdAsync(Guid ploId);
+        Task UpdateAsync(PO_PLO_Mapping mapping);
+        Task UpdateManyAsync(IEnumerable<PO_PLO_Mapping> mappings);
+        Task<PO_PLO_Mapping?> GetMappingAsync(Guid poId, Guid ploId);
 
     }
 }
