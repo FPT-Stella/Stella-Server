@@ -359,5 +359,32 @@ namespace FPTStella.Application.Services
                 }).ToList()
             };
         }
+        public async Task UpdatePoPloMappingAsync(PatchPloMappingDto dto)
+        {
+            if (dto == null || dto.PloId == Guid.Empty)
+                throw new ArgumentException("Invalid PLO ID");
+
+            // Xóa ánh xạ cũ
+            await _mappingRepository.DeleteMappingsByPloIdAsync(dto.PloId);
+
+            // Tạo mới nếu có
+            if (dto.PoIds != null && dto.PoIds.Any())
+            {
+                var now = DateTime.UtcNow;
+                var newMappings = dto.PoIds.Select(poId => new PO_PLO_Mapping
+                {
+                    Id = Guid.NewGuid(),
+                    PoId = poId,
+                    PloId = dto.PloId,
+                    InsDate = now,
+                    UpdDate = now,
+                    DelFlg = false
+                }).ToList();
+
+                await _mappingRepository.AddManyAsync(newMappings);
+            }
+
+            await _unitOfWork.SaveAsync();
+        }
     }
 }
