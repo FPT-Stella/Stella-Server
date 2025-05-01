@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace FPTStella.Contracts.DTOs.SubjectComboSubjects
 {
-    public class UpdateSubjectComboSubjectDto
+    public class PatchSubjectComboMappingDto
     {
         public Guid SubjectComboId { get; set; }
-        public Guid SubjectId { get; set; }
-        public Guid? NewSubjectComboId { get; set; }
-        public Guid? NewSubjectId { get; set; }
+        public List<Guid> SubjectIds { get; set; } = new List<Guid>();
     }
 }

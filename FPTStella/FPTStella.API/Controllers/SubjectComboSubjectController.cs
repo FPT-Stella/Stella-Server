@@ -38,6 +38,24 @@ namespace FPTStella.API.Controllers
                 return HandleException(ex);
             }
         }
+        /// <summary>
+        /// Creates multiple mappings between subject combos and subjects in a batch operation
+        /// </summary>
+        /// <param name="batchDto">The batch of mappings to create</param>
+        /// <returns>The successfully created mappings</returns>
+        [HttpPost("batch")]
+        public async Task<IActionResult> CreateMappingBatch([FromBody] CreateSubjectComboSubjectBatchDto batchDto)
+        {
+            try
+            {
+                var result = await _subjectComboSubjectService.CreateMappingBatchAsync(batchDto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
 
         /// <summary>
         /// Gets a mapping by its ID
@@ -263,6 +281,54 @@ namespace FPTStella.API.Controllers
                     pageSize);
 
                 return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+        [HttpPut("batch")]
+        public async Task<IActionResult> UpdateMappingsBatch([FromBody] UpdateSubjectComboSubjectBatchDto batchDto)
+        {
+            try
+            {
+                var result = await _subjectComboSubjectService.UpdateMappingsBatchAsync(batchDto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        /// <summary>
+        /// Updates all subject mappings for a specific subject combo
+        /// </summary>
+        /// <param name="dto">The patch DTO containing subject combo ID and new subject IDs</param>
+        [HttpPatch("subject-combo-mapping")]
+        public async Task<IActionResult> UpdateSubjectComboMapping([FromBody] PatchSubjectComboMappingDto dto)
+        {
+            try
+            {
+                await _subjectComboSubjectService.UpdateSubjectComboMappingAsync(dto);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+        /// <summary>
+        /// Updates all subject combo mappings for a specific subject
+        /// </summary>
+        /// <param name="dto">The patch DTO containing subject ID and new subject combo IDs</param>
+        [HttpPatch("subject-mapping")]
+        public async Task<IActionResult> UpdateSubjectMapping([FromBody] PatchSubjectMappingDto dto)
+        {
+            try
+            {
+                await _subjectComboSubjectService.UpdateSubjectMappingAsync(dto);
+                return NoContent();
             }
             catch (Exception ex)
             {

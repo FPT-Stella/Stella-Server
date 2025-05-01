@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FPTStella.Contracts.DTOs.SubjectComboSubjects
+namespace FPTStella.Contracts.DTOs.SubjectTools
 {
-    public class UpdateSubjectComboSubjectDto
+    public class UpdateSubjectToolDto
     {
-        public Guid SubjectComboId { get; set; }
         public Guid SubjectId { get; set; }
-        public Guid? NewSubjectComboId { get; set; }
+        public Guid ToolId { get; set; }
         public Guid? NewSubjectId { get; set; }
+        public Guid? NewToolId { get; set; }
     }
 }

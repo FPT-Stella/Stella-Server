@@ -158,5 +158,18 @@ namespace FPTStella.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPatch("po-mapping")]
+        public async Task<IActionResult> UpdatePoMapping([FromBody] PatchPoMappingDto dto)
+        {
+            try
+            {
+                await _poPloMappingService.UpdatePoMappingAsync(dto);
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

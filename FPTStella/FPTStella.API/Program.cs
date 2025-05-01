@@ -46,6 +46,7 @@ builder.Services.AddSingleton<ISubjectInCurriculumRepository, SubjectInCurriculu
 builder.Services.AddSingleton<ISubjectComboRepository, SubjectComboRepository>();
 builder.Services.AddSingleton<ISubjectComboSubjectRepository, SubjectComboSubjectRepository>();
 builder.Services.AddSingleton<IToolRepository, ToolRepository>();
+builder.Services.AddScoped<ISubjectToolRepository, SubjectToolRepository>();
 
 
 // Đăng ký DI cho Application
@@ -68,6 +69,7 @@ builder.Services.AddSingleton<IToolService, ToolService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<ISubjectToolService,SubjectToolService>();
 
 
 //JWT

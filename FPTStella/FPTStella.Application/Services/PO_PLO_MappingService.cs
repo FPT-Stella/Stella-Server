@@ -386,5 +386,36 @@ namespace FPTStella.Application.Services
 
             await _unitOfWork.SaveAsync();
         }
+        /// <summary>
+        /// Updates all PLO mappings for a specific PO by replacing all existing mappings
+        /// </summary>
+        /// <param name="dto">The DTO containing PO ID and the list of PLO IDs to associate with it</param>
+        public async Task UpdatePoMappingAsync(PatchPoMappingDto dto)
+        {
+            if (dto == null || dto.PoId == Guid.Empty)
+                throw new ArgumentException("Invalid PO ID");
+
+            // Delete old mappings
+            await _mappingRepository.DeleteMappingsByPoIdAsync(dto.PoId);
+
+            // Create new mappings if there are any PLO IDs provided
+            if (dto.PloIds != null && dto.PloIds.Any())
+            {
+                var now = DateTime.UtcNow;
+                var newMappings = dto.PloIds.Select(ploId => new PO_PLO_Mapping
+                {
+                    Id = Guid.NewGuid(),
+                    PoId = dto.PoId,
+                    PloId = ploId,
+                    InsDate = now,
+                    UpdDate = now,
+                    DelFlg = false
+                }).ToList();
+
+                await _mappingRepository.AddManyAsync(newMappings);
+            }
+
+            await _unitOfWork.SaveAsync();
+        }
     }
 }
