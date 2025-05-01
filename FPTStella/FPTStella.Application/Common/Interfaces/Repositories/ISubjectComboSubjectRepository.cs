@@ -70,5 +70,31 @@ namespace FPTStella.Application.Common.Interfaces.Repositories
               Guid? subjectComboId = null,
               Guid? subjectId = null,
               PaginationParams? paginationParams = null);
+        // Add to ISubjectComboSubjectRepository.cs
+        /// <summary>
+        /// Gets a specific mapping between a subject combo and a subject
+        /// </summary>
+        /// <param name="subjectComboId">The subject combo ID</param>
+        /// <param name="subjectId">The subject ID</param>
+        /// <returns>The mapping if it exists, otherwise null</returns>
+        Task<SubjectComboSubjects?> GetMappingAsync(Guid subjectComboId, Guid subjectId);
+
+        /// <summary>
+        /// Updates a subject combo subject mapping in the database
+        /// </summary>
+        /// <param name="mapping">The mapping to update</param>
+        Task UpdateAsync(SubjectComboSubjects mapping);
+
+        /// <summary>
+        /// Updates multiple subject combo subject mappings in the database
+        /// </summary>
+        /// <param name="mappings">The mappings to update</param>
+        Task UpdateManyAsync(IEnumerable<SubjectComboSubjects> mappings);
+
+        /// <summary>
+        /// Adds multiple subject combo subject mappings to the database
+        /// </summary>
+        /// <param name="mappings">The mappings to add</param>
+        Task AddManyAsync(IEnumerable<SubjectComboSubjects> mappings);
     }
 }

@@ -100,5 +100,26 @@ namespace FPTStella.Application.Common.Interfaces.Services
             Guid? subjectId = null,
             int pageNumber = 1,
             int pageSize = 10);
+        // Add to ISubjectComboSubjectService.cs
+        /// <summary>
+        /// Creates multiple mappings between subject combos and subjects in a batch operation
+        /// </summary>
+        /// <param name="batchDto">The batch of mappings to create</param>
+        /// <returns>The successfully created mappings</returns>
+        Task<CreateSubjectComboSubjectBatchDto> CreateMappingBatchAsync(CreateSubjectComboSubjectBatchDto batchDto);
+
+        /// <summary>
+        /// Updates multiple mappings between subject combos and subjects in a batch operation
+        /// </summary>
+        /// <param name="batchDto">The batch of mappings to update</param>
+        /// <returns>Result containing information about successful and failed updates</returns>
+        Task<UpdateSubjectComboSubjectResultDto> UpdateMappingsBatchAsync(UpdateSubjectComboSubjectBatchDto batchDto);
+
+        /// <summary>
+        /// Updates all subject mappings for a specific subject combo
+        /// </summary>
+        /// <param name="dto">The patch DTO containing subject combo ID and new subject IDs</param>
+        Task UpdateSubjectComboMappingAsync(PatchSubjectComboMappingDto dto);
+        Task UpdateSubjectMappingAsync(PatchSubjectMappingDto dto);
     }
 }

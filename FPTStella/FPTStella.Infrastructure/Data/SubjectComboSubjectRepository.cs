@@ -166,5 +166,53 @@ namespace FPTStella.Infrastructure.Data
                 Items = items
             };
         }
+        // Add to SubjectComboSubjectRepository.cs
+        public async Task<SubjectComboSubjects?> GetMappingAsync(Guid subjectComboId, Guid subjectId)
+        {
+            var filter = Builders<SubjectComboSubjects>.Filter.Eq(m => m.SubjectComboId, subjectComboId) &
+                         Builders<SubjectComboSubjects>.Filter.Eq(m => m.SubjectId, subjectId) &
+                         NotDeletedFilter;
+
+            return await _collection.Find(filter).FirstOrDefaultAsync();
+        }
+
+        public async Task UpdateAsync(SubjectComboSubjects mapping)
+        {
+            if (mapping == null)
+            {
+                throw new ArgumentNullException(nameof(mapping));
+            }
+
+            mapping.UpdDate = DateTime.UtcNow;
+
+            // Create a filter to find the document by ID
+            var filter = Builders<SubjectComboSubjects>.Filter.Eq(m => m.Id, mapping.Id);
+
+            // Replace the existing document with the updated one
+            await _collection.ReplaceOneAsync(filter, mapping);
+        }
+
+        public async Task UpdateManyAsync(IEnumerable<SubjectComboSubjects> mappings)
+        {
+            if (mappings == null)
+            {
+                throw new ArgumentNullException(nameof(mappings));
+            }
+
+            foreach (var mapping in mappings)
+            {
+                await UpdateAsync(mapping);
+            }
+        }
+
+        public async Task AddManyAsync(IEnumerable<SubjectComboSubjects> mappings)
+        {
+            if (mappings == null)
+            {
+                throw new ArgumentNullException(nameof(mappings));
+            }
+
+            await InsertManyAsync(mappings);
+        }
     }
 }
