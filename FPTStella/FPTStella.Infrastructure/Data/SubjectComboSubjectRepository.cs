@@ -21,19 +21,40 @@ namespace FPTStella.Infrastructure.Data
         }
         private void CreateIndexes()
         {
-            _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
-                Builders<SubjectComboSubjects>.IndexKeys.Ascending(s => s.SubjectComboId),
-                new CreateIndexOptions { Background = true }));
+            try
+            {
+                _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
+                    Builders<SubjectComboSubjects>.IndexKeys.Ascending(s => s.SubjectComboId),
+                    new CreateIndexOptions { Background = true }));
 
-            _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
-                Builders<SubjectComboSubjects>.IndexKeys.Ascending(s => s.SubjectId),
-                new CreateIndexOptions { Background = true }));
+                _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
+                    Builders<SubjectComboSubjects>.IndexKeys.Ascending(s => s.SubjectId),
+                    new CreateIndexOptions { Background = true }));
 
-            _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
-                Builders<SubjectComboSubjects>.IndexKeys
-                    .Ascending(s => s.SubjectComboId)
-                    .Ascending(s => s.SubjectId),
-                new CreateIndexOptions { Unique = true, Background = true }));
+                // Unique index trên cặp (SubjectComboId, SubjectId)
+                var uniqueIndexOptions = new CreateIndexOptions<SubjectComboSubjects>
+                {
+                    Unique = true,
+                    Background = true,
+                    // Chỉ áp dụng unique index cho các bản ghi chưa bị xóa
+                    PartialFilterExpression = Builders<SubjectComboSubjects>.Filter.Eq(s => s.DelFlg, false)
+                };
+
+                _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
+                    Builders<SubjectComboSubjects>.IndexKeys
+                        .Ascending(s => s.SubjectComboId)
+                        .Ascending(s => s.SubjectId),
+                    uniqueIndexOptions));
+            }
+            catch (MongoDB.Driver.MongoCommandException ex)
+            {
+                Console.WriteLine($"Error creating indexes: {ex.Message}");
+                _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
+                    Builders<SubjectComboSubjects>.IndexKeys
+                        .Ascending(s => s.SubjectComboId)
+                        .Ascending(s => s.SubjectId),
+                    new CreateIndexOptions { Background = true }));
+            }
         }
         /// <summary>
         /// Gets all subject mappings for a specific subject combo

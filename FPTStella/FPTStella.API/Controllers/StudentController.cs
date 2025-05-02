@@ -45,6 +45,28 @@ namespace FPTStella.API.Controllers
                 return HandleException(ex);
             }
         }
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchStudents(
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] Guid? majorId = null,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var results = await _studentService.SearchStudentsAsync(
+                    searchTerm,
+                    majorId,
+                    pageNumber,
+                    pageSize);
+
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> CreateStudent([FromBody] CreateStudentDto createStudentDto)
         {
