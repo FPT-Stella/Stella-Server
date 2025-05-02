@@ -47,6 +47,7 @@ builder.Services.AddSingleton<ISubjectComboRepository, SubjectComboRepository>()
 builder.Services.AddSingleton<ISubjectComboSubjectRepository, SubjectComboSubjectRepository>();
 builder.Services.AddSingleton<IToolRepository, ToolRepository>();
 builder.Services.AddScoped<ISubjectToolRepository, SubjectToolRepository>();
+builder.Services.AddSingleton<IMaterialRepository, MaterialRepository>();
 
 
 // Đăng ký DI cho Application
@@ -65,6 +66,7 @@ builder.Services.AddSingleton<IEmailService, EmailService>();
 builder.Services.AddSingleton<ISubjectComboService, SubjectComboService>();
 builder.Services.AddSingleton<ISubjectComboSubjectService, SubjectComboSubjectService>();
 builder.Services.AddSingleton<IToolService, ToolService>();
+builder.Services.AddSingleton<IMaterialService, MaterialService>();
 
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
@@ -97,7 +99,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "✨ FPT Stella ✨", Version = "v1.3.0" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "✨ FPT Stella ✨", Version = "v2.0.0" });
 
     // Cấu hình Bearer token 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
