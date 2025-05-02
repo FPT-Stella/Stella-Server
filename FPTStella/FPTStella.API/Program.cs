@@ -49,6 +49,10 @@ builder.Services.AddSingleton<IToolRepository, ToolRepository>();
 builder.Services.AddScoped<ISubjectToolRepository, SubjectToolRepository>();
 builder.Services.AddSingleton<IMaterialRepository, MaterialRepository>();
 
+builder.Services.AddScoped<IChatHistoryRepository, ChatHistoryRepository>();
+builder.Services.AddScoped<ICLORepository, CLORepository>();
+builder.Services.AddScoped<ICLO_PLO_MappingRepository, CLO_PLO_MappingRepository>();
+
 
 // Đăng ký DI cho Application
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -72,6 +76,9 @@ builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ISubjectToolService,SubjectToolService>();
+builder.Services.AddScoped<IChatHistoryService, ChatHistoryService>();
+builder.Services.AddScoped<ICLOService, CLOService>();
+builder.Services.AddScoped<ICLO_PLO_MappingService, CLO_PLO_MappingService>();
 
 
 //JWT
