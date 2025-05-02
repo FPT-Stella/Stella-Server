@@ -23,20 +23,22 @@ namespace FPTStella.Infrastructure.Data
         {
             try
             {
+                // First single-field index
                 _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
                     Builders<SubjectComboSubjects>.IndexKeys.Ascending(s => s.SubjectComboId),
-                    new CreateIndexOptions { Background = true }));
+                    new CreateIndexOptions { Name = "idx_subjectComboId", Background = true }));
 
+                // Second single-field index
                 _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
                     Builders<SubjectComboSubjects>.IndexKeys.Ascending(s => s.SubjectId),
-                    new CreateIndexOptions { Background = true }));
+                    new CreateIndexOptions { Name = "idx_subjectId", Background = true }));
 
-                // Unique index trên cặp (SubjectComboId, SubjectId)
+                // Unique composite index
                 var uniqueIndexOptions = new CreateIndexOptions<SubjectComboSubjects>
                 {
+                    Name = "idx_unique_combo_subject_active",
                     Unique = true,
                     Background = true,
-                    // Chỉ áp dụng unique index cho các bản ghi chưa bị xóa
                     PartialFilterExpression = Builders<SubjectComboSubjects>.Filter.Eq(s => s.DelFlg, false)
                 };
 
@@ -49,11 +51,13 @@ namespace FPTStella.Infrastructure.Data
             catch (MongoDB.Driver.MongoCommandException ex)
             {
                 Console.WriteLine($"Error creating indexes: {ex.Message}");
+
+                // Use a different name for the fallback index
                 _collection.Indexes.CreateOne(new CreateIndexModel<SubjectComboSubjects>(
                     Builders<SubjectComboSubjects>.IndexKeys
                         .Ascending(s => s.SubjectComboId)
                         .Ascending(s => s.SubjectId),
-                    new CreateIndexOptions { Background = true }));
+                    new CreateIndexOptions { Name = "idx_non_unique_combo_subject", Background = true }));
             }
         }
         /// <summary>
@@ -233,7 +237,29 @@ namespace FPTStella.Infrastructure.Data
                 throw new ArgumentNullException(nameof(mappings));
             }
 
-            await InsertManyAsync(mappings);
+            // Filter out duplicates by checking if the mapping already exists
+            var uniqueMappings = new List<SubjectComboSubjects>();
+            foreach (var mapping in mappings)
+            {
+                var exists = await IsMappingExistedAsync(mapping.SubjectComboId, mapping.SubjectId);
+                if (!exists)
+                {
+                    uniqueMappings.Add(mapping);
+                }
+            }
+
+            if (uniqueMappings.Any())
+            {
+                try
+                {
+                    await _collection.InsertManyAsync(uniqueMappings);
+                }
+                catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+                {
+                    // Log and ignore duplicate key errors
+                    Console.WriteLine($"Duplicate key error: {ex.Message}");
+                }
+            }
         }
     }
 }

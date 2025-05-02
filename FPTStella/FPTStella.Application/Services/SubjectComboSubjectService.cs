@@ -4,6 +4,7 @@ using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Contracts.DTOs.SubjectComboSubjects;
 using FPTStella.Domain.Common;
 using FPTStella.Domain.Entities;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -439,23 +440,39 @@ namespace FPTStella.Application.Services
                 throw new ArgumentException("Invalid subject combo ID");
 
             // Delete old mappings
-            await _subjectComboSubjectRepository.DeleteMappingsBySubjectComboIdAsync(dto.SubjectComboId);
+            //await _subjectComboSubjectRepository.DeleteMappingsBySubjectComboIdAsync(dto.SubjectComboId);
 
             // Create new ones if any
             if (dto.SubjectIds != null && dto.SubjectIds.Any())
             {
                 var now = DateTime.UtcNow;
-                var newMappings = dto.SubjectIds.Select(subjectId => new SubjectComboSubjects
-                {
-                    Id = Guid.NewGuid(),
-                    SubjectComboId = dto.SubjectComboId,
-                    SubjectId = subjectId,
-                    InsDate = now,
-                    UpdDate = now,
-                    DelFlg = false
-                }).ToList();
+                var newMappings = new List<SubjectComboSubjects>();
 
-                await _subjectComboSubjectRepository.AddManyAsync(newMappings);
+                // Retrieve existing mappings for the subject combo
+                var existingMappings = await _subjectComboSubjectRepository.GetBySubjectComboIdAsync(dto.SubjectComboId);
+                var existingSubjectIds = existingMappings.Select(m => m.SubjectId).ToHashSet();
+
+                foreach (var subjectId in dto.SubjectIds)
+                {
+                    // Skip if the mapping already exists
+                    if (existingSubjectIds.Contains(subjectId))
+                        continue;
+
+                    newMappings.Add(new SubjectComboSubjects
+                    {
+                        Id = Guid.NewGuid(),
+                        SubjectComboId = dto.SubjectComboId,
+                        SubjectId = subjectId,
+                        InsDate = now,
+                        UpdDate = now,
+                        DelFlg = false
+                    });
+                }
+
+                if (newMappings.Any())
+                {
+                    await _subjectComboSubjectRepository.AddManyAsync(newMappings);
+                }
             }
 
             await _unitOfWork.SaveAsync();
