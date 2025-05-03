@@ -235,7 +235,6 @@ namespace FPTStella.Application.Services
             var updatedMappings = new List<UpdateSubjectToolDto>();
             var failedMappings = new List<(UpdateSubjectToolDto Mapping, string Reason)>();
 
-            // Validate Subject and Tool existence in batch
             var allSubjectIds = updateMappingBatchDto.Mappings
                 .SelectMany(m => new[] { m.SubjectId, m.NewSubjectId })
                 .Where(id => id.HasValue && id.Value != Guid.Empty)
@@ -272,7 +271,6 @@ namespace FPTStella.Application.Services
             {
                 try
                 {
-                    // Validate the existing mapping
                     var existingMapping = await _subjectToolRepository.GetMappingAsync(mappingDto.SubjectId, mappingDto.ToolId);
                     if (existingMapping == null)
                     {
@@ -280,7 +278,6 @@ namespace FPTStella.Application.Services
                         continue;
                     }
 
-                    // Validate new Subject ID if provided
                     if (mappingDto.NewSubjectId.HasValue && mappingDto.NewSubjectId.Value != Guid.Empty)
                     {
                         if (!existingSubjects.TryGetValue(mappingDto.NewSubjectId.Value, out var subjectExists) || !subjectExists)

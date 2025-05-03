@@ -15,15 +15,20 @@ namespace FPTStella.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ISubjectInCurriculumRepository _subjectInCurriculumRepository;
-        /// <summary>
+        private readonly ISubjectRepository _subjectRepository;
         /// Initializes a new instance of the SubjectInCurriculumService class.
         /// </summary>
         /// <param name="unitOfWork">The unit of work</param>
         /// <param name="subjectInCurriculumRepository">The subject in curriculum repository</param>
-        public SubjectInCurriculumService(IUnitOfWork unitOfWork, ISubjectInCurriculumRepository subjectInCurriculumRepository)
+        /// <param name="subjectRepository">The subject repository</param>
+        public SubjectInCurriculumService(
+            IUnitOfWork unitOfWork,
+            ISubjectInCurriculumRepository subjectInCurriculumRepository,
+            ISubjectRepository subjectRepository)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _subjectInCurriculumRepository = subjectInCurriculumRepository ?? throw new ArgumentNullException(nameof(subjectInCurriculumRepository));
+            _subjectRepository = subjectRepository ?? throw new ArgumentNullException(nameof(subjectRepository));
         }
 
         /// <summary>
@@ -31,12 +36,25 @@ namespace FPTStella.Application.Services
         /// </summary>
         /// <param name="entity">The SubjectInCurriculum entity</param>
         /// <returns>A mapped SubjectInCurriculumDto object</returns>
-        private static SubjectInCurriculumDto MapToDto(SubjectInCurriculum entity) => new()
+        private async Task<SubjectInCurriculumDto> MapToDtoAsync(SubjectInCurriculum entity)
         {
-            Id = entity.Id,
-            CurriculumId = entity.CurriculumId,
-            SubjectId = entity.SubjectId
-        };
+            var dto = new SubjectInCurriculumDto
+            {
+                Id = entity.Id,
+                CurriculumId = entity.CurriculumId,
+                SubjectId = entity.SubjectId
+            };
+
+            // Fetch the subject details
+            var subject = await _subjectRepository.GetByIdAsync(entity.SubjectId.ToString());
+            if (subject != null && !subject.DelFlg)
+            {
+                dto.SubjectCode = subject.SubjectCode;
+                dto.SubjectName = subject.SubjectName;
+            }
+
+            return dto;
+        }
 
         /// <summary>
         /// Creates a new mapping between a subject and a curriculum.
@@ -62,7 +80,7 @@ namespace FPTStella.Application.Services
             await _subjectInCurriculumRepository.InsertAsync(mapping);
             await _unitOfWork.SaveAsync();
 
-            return MapToDto(mapping);
+            return await MapToDtoAsync(mapping);
         }
 
         /// <summary>
@@ -125,7 +143,7 @@ namespace FPTStella.Application.Services
                 throw new KeyNotFoundException($"Subject-Curriculum mapping with ID {id} not found.");
             }
 
-            return MapToDto(mapping);
+            return await MapToDtoAsync(mapping);
         }
 
         /// <summary>
@@ -135,7 +153,14 @@ namespace FPTStella.Application.Services
         public async Task<List<SubjectInCurriculumDto>> GetAllMappingsAsync()
         {
             var mappings = await _subjectInCurriculumRepository.FilterByAsync(m => !m.DelFlg);
-            return mappings.Select(MapToDto).ToList();
+            var result = new List<SubjectInCurriculumDto>();
+
+            foreach (var mapping in mappings)
+            {
+                result.Add(await MapToDtoAsync(mapping));
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -146,7 +171,14 @@ namespace FPTStella.Application.Services
         public async Task<List<SubjectInCurriculumDto>> GetMappingsByCurriculumIdAsync(Guid curriculumId)
         {
             var mappings = await _subjectInCurriculumRepository.GetByCurriculumIdAsync(curriculumId);
-            return mappings.Select(MapToDto).ToList();
+            var result = new List<SubjectInCurriculumDto>();
+
+            foreach (var mapping in mappings)
+            {
+                result.Add(await MapToDtoAsync(mapping));
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -157,7 +189,14 @@ namespace FPTStella.Application.Services
         public async Task<List<SubjectInCurriculumDto>> GetMappingsBySubjectIdAsync(Guid subjectId)
         {
             var mappings = await _subjectInCurriculumRepository.GetBySubjectIdAsync(subjectId);
-            return mappings.Select(MapToDto).ToList();
+            var result = new List<SubjectInCurriculumDto>();
+
+            foreach (var mapping in mappings)
+            {
+                result.Add(await MapToDtoAsync(mapping));
+            }
+
+            return result;
         }
 
         /// <summary>
