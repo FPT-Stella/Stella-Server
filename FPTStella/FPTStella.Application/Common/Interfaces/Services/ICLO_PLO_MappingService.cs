@@ -1,5 +1,6 @@
 ﻿using FPTStella.Contracts.DTOs.CLO_PLO_Mappings;
 using FPTStella.Contracts.DTOs.CLOs;
+using FPTStella.Contracts.DTOs.PLOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,5 +22,7 @@ namespace FPTStella.Application.Common.Interfaces.Services
         Task<UpdateCLO_PLO_MappingResultDto> UpdateMappingsAsync(UpdateCLO_PLO_MappingBatchDto updateMappingBatchDto);
         Task UpdateCloPlaMappingAsync(PatchCloPloMappingDto dto);
         Task UpdateCloMappingAsync(PatchCloMappingDto dto);
+        Task<List<PLOWithCurriculumDto>> GetPLOsWithDetailsByCloIdAsync(Guid cloId);
+
     }
 }

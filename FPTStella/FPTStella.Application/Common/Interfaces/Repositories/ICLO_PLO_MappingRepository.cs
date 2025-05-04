@@ -82,5 +82,7 @@ namespace FPTStella.Application.Common.Interfaces.Repositories
         /// Adds multiple mappings at once.
         /// </summary>
         Task AddManyAsync(IEnumerable<CLO_PLO_Mapping> mappings);
+        Task<List<(Guid Id, string PloName, string CurriculumName, string Description)>> GetPLOsWithDetailsByCloIdAsync(Guid cloId);
+
     }
-    }
+}

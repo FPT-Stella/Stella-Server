@@ -2,10 +2,6 @@
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FPTStella.Domain.Entities
 {
@@ -18,7 +14,13 @@ namespace FPTStella.Domain.Entities
         [BsonElement("subject_id")]
         public Guid SubjectId { get; set; }
 
+        [BsonElement("clo_name")]
+        public string CloName { get; set; } = string.Empty;
+
         [BsonElement("clo_details")]
         public string CloDetails { get; set; } = string.Empty;
+
+        [BsonElement("lo_details")]
+        public string LoDetails { get; set; } = string.Empty;
     }
 }

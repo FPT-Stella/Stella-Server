@@ -142,5 +142,42 @@ namespace FPTStella.Infrastructure.Data
 
             await InsertManyAsync(mappings);
         }
+        public async Task<List<(Guid Id, string PloName, string CurriculumName, string Description)>> GetPLOsWithDetailsByCloIdAsync(Guid cloId)
+        {
+            // Step 1: Get PLO IDs from mappings
+            var filter = Builders<CLO_PLO_Mapping>.Filter.Eq(m => m.CloId, cloId) &
+                         Builders<CLO_PLO_Mapping>.Filter.Eq(m => m.DelFlg, false);
+            var mappings = await _collection.Find(filter).ToListAsync();
+
+            if (!mappings.Any())
+            {
+                return new List<(Guid, string, string, string)>();
+            }
+            var ploIds = mappings.Select(m => m.PloId).ToList();
+
+            // Step 2: Get PLO details from PLOs collection
+            var ploCollection = _collection.Database.GetCollection<PLOs>("PLOs");
+            var ploFilter = Builders<PLOs>.Filter.In(p => p.Id, ploIds) &
+                           Builders<PLOs>.Filter.Eq(p => p.DelFlg, false);
+
+            var plos = await ploCollection.Find(ploFilter).ToListAsync();
+
+            // Step 3: Get curriculum information for each PLO
+            var curriculumIds = plos.Select(p => p.CurriculumId).Distinct().ToList();
+            var curriculumCollection = _collection.Database.GetCollection<Curriculums>("Curriculums");
+            var curriculumFilter = Builders<Curriculums>.Filter.In(c => c.Id, curriculumIds) &
+                                  Builders<Curriculums>.Filter.Eq(c => c.DelFlg, false);
+
+            var curriculums = await curriculumCollection.Find(curriculumFilter).ToListAsync();
+            var curriculumDict = curriculums.ToDictionary(c => c.Id, c => c.CurriculumName);
+
+            // Step 4: Map to result format
+            return plos.Select(p => (
+                p.Id,
+                p.PloName,
+                curriculumDict.TryGetValue(p.CurriculumId, out var name) ? name : string.Empty,
+                p.Description
+            )).ToList();
+        }
     }
 }

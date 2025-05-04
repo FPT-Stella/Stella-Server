@@ -158,5 +158,18 @@ namespace FPTStella.API.Controllers
                     return BadRequest(ex.Message);
                 }
             }
+        [HttpGet("plo-details/{cloId}")]
+        public async Task<IActionResult> GetPloDetailsWithCurriculumByCloId(Guid cloId)
+        {
+            try
+            {
+                var plos = await _cloPlaMappingService.GetPLOsWithDetailsByCloIdAsync(cloId);
+                return Ok(plos);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
+    }
 }

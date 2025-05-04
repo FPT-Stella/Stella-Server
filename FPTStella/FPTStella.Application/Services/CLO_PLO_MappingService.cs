@@ -3,6 +3,7 @@ using FPTStella.Application.Common.Interfaces.Services;
 using FPTStella.Application.Common.Interfaces.UnitOfWorks;
 using FPTStella.Contracts.DTOs.CLO_PLO_Mappings;
 using FPTStella.Contracts.DTOs.CLOs;
+using FPTStella.Contracts.DTOs.PLOs;
 using FPTStella.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -162,7 +163,8 @@ namespace FPTStella.Application.Services
             return cloDetailsWithName.Select(c => new CLOWithDetailsDto
             {
                 Id = c.Id,
-                Details = c.Details
+               // CloName = c.CloName,
+                CloDetails = c.Details
             }).ToList();
         }
 
@@ -342,6 +344,18 @@ namespace FPTStella.Application.Services
             }
 
             await _unitOfWork.SaveAsync();
+        }
+        public async Task<List<PLOWithCurriculumDto>> GetPLOsWithDetailsByCloIdAsync(Guid cloId)
+        {
+            var ploDetails = await _mappingRepository.GetPLOsWithDetailsByCloIdAsync(cloId);
+
+            return ploDetails.Select(p => new PLOWithCurriculumDto
+            {
+                Id = p.Id,
+                PloName = p.PloName,
+                CurriculumName = p.CurriculumName,
+                Description = p.Description
+            }).ToList();
         }
     }
 }
