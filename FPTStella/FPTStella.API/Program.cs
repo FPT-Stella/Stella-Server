@@ -71,6 +71,7 @@ builder.Services.AddSingleton<ISubjectComboService, SubjectComboService>();
 builder.Services.AddSingleton<ISubjectComboSubjectService, SubjectComboSubjectService>();
 builder.Services.AddSingleton<IToolService, ToolService>();
 builder.Services.AddSingleton<IMaterialService, MaterialService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<GoogleLoginUseCase>();
