@@ -71,7 +71,7 @@ namespace FPTStella.API.Controllers
                     new KeyValuePair<string, string>("code", decodedCode),
                     new KeyValuePair<string, string>("client_id", _configuration["Google:ClientId"]),
                     new KeyValuePair<string, string>("client_secret", _configuration["Google:ClientSecret"]),
-                     new KeyValuePair<string, string>("redirect_uri", "http://localhost:5173/oauth/google/callback"),
+                     new KeyValuePair<string, string>("redirect_uri", "https://fptstella.vercel.app/oauth/google/callback"),
                     new KeyValuePair<string, string>("grant_type", "authorization_code")
                 };
                 Console.WriteLine("======== GOOGLE OAUTH REQUEST ========");
