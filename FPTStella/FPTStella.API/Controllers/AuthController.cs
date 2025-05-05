@@ -20,17 +20,20 @@ namespace FPTStella.API.Controllers
         private readonly IAccountService _accountService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
 
         public AuthController(
             GoogleLoginUseCase googleLoginUseCase,
             IHttpClientFactory httpClientFactory,
             IConfiguration configuration,
-            IAccountService accountService)
+            IAccountService accountService,
+            IWebHostEnvironment environment)
         {
             _googleLoginUseCase = googleLoginUseCase ?? throw new ArgumentNullException(nameof(googleLoginUseCase));
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _accountService = accountService;
+            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
         [HttpPost("admin-login")]
         public async Task<IActionResult> AdminLogin([FromBody] AdminLoginRequest request)
@@ -66,12 +69,17 @@ namespace FPTStella.API.Controllers
                 var decodedCode = Uri.UnescapeDataString(codeDto.code);
                 Console.WriteLine($"Decoded code: {decodedCode}");
 
+                var redirectUri = _configuration.GetValue<string>(
+                                 _environment.IsDevelopment()
+                                     ? "Google:RedirectUriDevelopment"
+                                     : "Google:RedirectUriProduction");
+
                 var formData = new[]
                 {
                     new KeyValuePair<string, string>("code", decodedCode),
                     new KeyValuePair<string, string>("client_id", _configuration["Google:ClientId"]),
                     new KeyValuePair<string, string>("client_secret", _configuration["Google:ClientSecret"]),
-                    new KeyValuePair<string, string>("redirect_uri", "http://localhost:5173/oauth/google/callback"),
+                    new KeyValuePair<string, string>("redirect_uri", redirectUri),
                     new KeyValuePair<string, string>("grant_type", "authorization_code")
                 };
                 Console.WriteLine("======== GOOGLE OAUTH REQUEST ========");
