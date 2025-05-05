@@ -78,6 +78,7 @@ namespace FPTStella.API.Controllers
                 Console.WriteLine($"Code: {decodedCode}");
                 Console.WriteLine($"Client ID: {_configuration["Google:ClientId"]}");
                 Console.WriteLine($"Client Secret: {_configuration["Google:ClientSecret"]}");
+                Console.WriteLine($"Redirect URI: {_configuration["Google:RedirectUri"]}");
                 Console.WriteLine("=======================================");
 
                 var formContent = new FormUrlEncodedContent(formData);
