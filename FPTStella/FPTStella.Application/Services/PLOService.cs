@@ -76,7 +76,22 @@ namespace FPTStella.Application.Services
         public async Task<List<PLOsDto>> GetAllPLOsAsync()
         {
             var plos = await _ploRepository.FilterByAsync(p => !p.DelFlg);
-            return plos.Select(MapToPLOsDto).ToList();
+
+            // Assuming we have a CurriculumRepository to fetch curriculum names
+            var curriculumRepository = _unitOfWork.Repository<Curriculums>();
+            var curriculumIds = plos.Select(p => p.CurriculumId).Distinct().ToList();
+            var curriculums = await curriculumRepository.FilterByAsync(c => curriculumIds.Contains(c.Id));
+
+            var curriculumDict = curriculums.ToDictionary(c => c.Id, c => c.CurriculumName);
+
+            return plos.Select(plo => new PLOsDto
+            {
+                Id = plo.Id,
+                CurriculumId = plo.CurriculumId,
+                PloName = plo.PloName,
+                Description = plo.Description,
+                CurriculumName = curriculumDict.TryGetValue(plo.CurriculumId, out var name) ? name : null
+            }).ToList();
         }
 
         /// <summary>
