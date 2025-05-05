@@ -15,23 +15,55 @@ namespace FPTStella.Infrastructure.Data
 
         private void CreateIndexes()
         {
-            // Unique index for SubjectId and CloName
-            _collection.Indexes.CreateOne(new CreateIndexModel<CLOs>(
-                Builders<CLOs>.IndexKeys
-                    .Ascending(c => c.SubjectId)
-                    .Ascending(c => c.CloName),
-                new CreateIndexOptions { Unique = true }));
+            try
+            {
+                // Unique index for SubjectId and CloName using partial filter
+                var cloNameIndexOptions = new CreateIndexOptions<CLOs>
+                {
+                    Unique = true,
+                    Background = true,
+                    PartialFilterExpression = Builders<CLOs>.Filter.And(
+                        Builders<CLOs>.Filter.Exists(c => c.CloName),
+                        Builders<CLOs>.Filter.Ne(c => c.CloName, string.Empty),
+                        Builders<CLOs>.Filter.Ne(c => c.CloName, null)
+                    )
+                };
 
-            // Unique index for SubjectId and CloDetails
-            _collection.Indexes.CreateOne(new CreateIndexModel<CLOs>(
-                Builders<CLOs>.IndexKeys
-                    .Ascending(c => c.SubjectId)
-                    .Ascending(c => c.CloDetails),
-                new CreateIndexOptions { Unique = true }));
+                _collection.Indexes.CreateOne(new CreateIndexModel<CLOs>(
+                    Builders<CLOs>.IndexKeys
+                        .Ascending(c => c.SubjectId)
+                        .Ascending(c => c.CloName),
+                    cloNameIndexOptions));
 
-            // Index for searching by SubjectId
-            _collection.Indexes.CreateOne(new CreateIndexModel<CLOs>(
-                Builders<CLOs>.IndexKeys.Ascending(c => c.SubjectId)));
+                // Unique index for SubjectId and CloDetails using partial filter
+                var cloDetailsIndexOptions = new CreateIndexOptions<CLOs>
+                {
+                    Unique = true,
+                    Background = true,
+                    PartialFilterExpression = Builders<CLOs>.Filter.And(
+                        Builders<CLOs>.Filter.Exists(c => c.CloDetails),
+                        Builders<CLOs>.Filter.Ne(c => c.CloDetails, string.Empty),
+                        Builders<CLOs>.Filter.Ne(c => c.CloDetails, null)
+                    )
+                };
+
+                _collection.Indexes.CreateOne(new CreateIndexModel<CLOs>(
+                    Builders<CLOs>.IndexKeys
+                        .Ascending(c => c.SubjectId)
+                        .Ascending(c => c.CloDetails),
+                    cloDetailsIndexOptions));
+
+                // Index for searching by SubjectId
+                _collection.Indexes.CreateOne(new CreateIndexModel<CLOs>(
+                    Builders<CLOs>.IndexKeys.Ascending(c => c.SubjectId)));
+            }
+            catch (MongoCommandException ex)
+            {
+                Console.WriteLine($"Error creating indexes: {ex.Message}");
+
+                _collection.Indexes.CreateOne(new CreateIndexModel<CLOs>(
+                    Builders<CLOs>.IndexKeys.Ascending(c => c.SubjectId)));
+            }
         }
 
         public CLORepository(IMongoDatabase database) : base(database, "CLOs")
