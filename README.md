@@ -104,7 +104,7 @@ cd Stella-Server
 - Mở trình duyệt và truy cập Swagger UI tại: `http://localhost:5000/swagger/index.html` (hoặc port được cấu hình trong `launchSettings.json`).
 
 ### 6. Truy cập API deploy
-- API đã được deploy tại: [http://103.179.185.152:5000/swagger/index.html](http://103.179.185.152:5000/swagger/index.html).
+- API đã được deploy tại: [Swagger UI](https://stella.dacoban.studio/swagger/index.html).
 - Sử dụng Swagger UI để khám phá và thử nghiệm các endpoint.
 
 ## Workflow phát triển
