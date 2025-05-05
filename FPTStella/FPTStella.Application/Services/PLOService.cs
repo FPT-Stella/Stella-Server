@@ -82,7 +82,7 @@ namespace FPTStella.Application.Services
             var curriculumIds = plos.Select(p => p.CurriculumId).Distinct().ToList();
             var curriculums = await curriculumRepository.FilterByAsync(c => curriculumIds.Contains(c.Id));
 
-            var curriculumDict = curriculums.ToDictionary(c => c.Id, c => c.CurriculumName);
+            var curriculumDict = curriculums.ToDictionary(c => c.Id, c => c.CurriculumCode);
 
             return plos.Select(plo => new PLOsDto
             {
@@ -90,7 +90,7 @@ namespace FPTStella.Application.Services
                 CurriculumId = plo.CurriculumId,
                 PloName = plo.PloName,
                 Description = plo.Description,
-                CurriculumName = curriculumDict.TryGetValue(plo.CurriculumId, out var name) ? name : null
+                CurriculumCode = curriculumDict.TryGetValue(plo.CurriculumId, out var name) ? name : null
             }).ToList();
         }
 
