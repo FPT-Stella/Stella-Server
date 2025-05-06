@@ -44,7 +44,7 @@ namespace FPTStella.Application.Common.Interfaces.Services
         /// Gets all materials
         /// </summary>
         /// <returns>List of all materials as DTOs</returns>
-        Task<List<MaterialDto>> GetAllMaterialsAsync();
+        Task<List<MaterialWithSubjectCodeDto>> GetAllMaterialsAsync();
         /// <summary>
         /// Updates a material
         /// </summary>
