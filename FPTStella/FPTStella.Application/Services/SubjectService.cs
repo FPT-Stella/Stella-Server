@@ -204,5 +204,10 @@ namespace FPTStella.Application.Services
 
             return true;
         }
+        public async Task<List<SubjectDto>> GetAllSubjectsWithIdAsync()
+        {
+            var subjects = await _subjectRepository.GetAllSubjectsAsync();
+            return subjects.Select(MapToSubjectDto).ToList();
+        }
     }
 }

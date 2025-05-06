@@ -22,5 +22,6 @@ namespace FPTStella.Application.Common.Interfaces.Services
         Task<Subjects?> GetByMajorIdAndSubjectNameAsync(Guid majorId, string subjectName);
         Task<bool> UpdateSubjectAsync(string id, UpdateSubjectDto updatedSubject);
         Task<bool> DeleteSubjectAsync(string id);
+        Task<List<SubjectDto>> GetAllSubjectsWithIdAsync();
     }
 }

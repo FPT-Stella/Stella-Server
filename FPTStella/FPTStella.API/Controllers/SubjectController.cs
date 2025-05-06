@@ -132,5 +132,11 @@ namespace FPTStella.API.Controllers
             var result = await _subjectService.GetByMajorIdAndSubjectNameAsync(majorId, name);
             return result == null ? NotFound("Subject not found.") : Ok(result);
         }
+        [HttpGet("with-id")]
+        public async Task<ActionResult<List<SubjectDto>>> GetAllSubjectsWithId()
+        {
+            var result = await _subjectService.GetAllSubjectsWithIdAsync();
+            return Ok(result);
+        }
     }
 }
