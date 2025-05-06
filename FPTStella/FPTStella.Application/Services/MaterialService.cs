@@ -125,10 +125,41 @@ namespace FPTStella.Application.Services
         /// <summary>
         /// Gets all materials
         /// </summary>
-        public async Task<List<MaterialDto>> GetAllMaterialsAsync()
+        /// <summary>
+        /// Gets all materials with their associated subject codes
+        /// </summary>
+        public async Task<List<MaterialWithSubjectCodeDto>> GetAllMaterialsAsync()
         {
             var materials = await _materialRepository.GetAllAsync();
-            return materials.Where(m => !m.DelFlg).Select(MapToDto).ToList();
+            var subjectRepository = _unitOfWork.Repository<Subjects>();
+
+            // Fetch all subject IDs from materials
+            var subjectIds = materials.Where(m => !m.DelFlg).Select(m => m.SubjectId).Distinct();
+
+            // Fetch subjects for the IDs
+            var subjects = await subjectRepository.FilterByAsync(s => subjectIds.Contains(s.Id));
+
+            // Map materials to DTOs and include SubjectCode
+            return materials
+                .Where(m => !m.DelFlg)
+                .Select(material =>
+                {
+                    var subject = subjects.FirstOrDefault(s => s.Id == material.SubjectId);
+                    return new MaterialWithSubjectCodeDto
+                    {
+                        Id = material.Id.ToString(),
+                        SubjectId = material.SubjectId.ToString(),
+                        MaterialName = material.MaterialName,
+                        MaterialType = material.MaterialType,
+                        MaterialUrl = material.MaterialUrl,
+                        Description = material.Description,
+                        CreatedAt = material.InsDate,
+                        UpdatedAt = material.UpdDate,
+                        DelFlg = material.DelFlg,
+                        SubjectCode = subject?.SubjectCode // Include SubjectCode
+                    };
+                })
+                .ToList();
         }
         /// <summary>
         /// Updates a material
