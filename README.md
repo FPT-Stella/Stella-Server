@@ -32,7 +32,7 @@ FPTStella/
 
 ### 1. Domain Layer (`FPTStella.Domain`)
 - **Ý nghĩa**: Đây là tầng cốt lõi, chứa các entity (như `Student`, `User`) và logic nghiệp vụ thuần túy không phụ thuộc vào bất kỳ công nghệ nào. Tầng này định nghĩa các quy tắc và cấu trúc dữ liệu cơ bản của hệ thống.
-- **Vai trò**: Đảm bảo tính toàn vẹn của dữ liệu và logic nghiệp vụ. Ví dụ: Các thuộc tính của `Student` (như `UserId`, `Name`) và các quy tắc liên quan được định nghĩa ở đây.
+- **Vai trò**: Đảm bảo tính toàn vẹn của dữ liệu và logic nghiệp vụ. Ví dụ: Các thuộc tính của `Student` (như `UserId`, `Name`) và các quy tắc, DTOs liên quan được định nghĩa ở đây.
 
 ### 2. Application Layer (`FPTStella.Application`)
 - **Ý nghĩa**: Tầng này chứa logic ứng dụng, bao gồm các service và interface để xử lý các nghiệp vụ cụ thể (như lấy thông tin sinh viên, tạo người dùng mới).
