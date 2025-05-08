@@ -1,4 +1,4 @@
-# Stella Server 🌠🪐
+# Stella Server Non🌠🪐
 
 ![GitHub](https://img.shields.io/github/license/FPT-Stella/Stella-Server)  
 ![GitHub last commit](https://img.shields.io/github/last-commit/FPT-Stella/Stella-Server)  
